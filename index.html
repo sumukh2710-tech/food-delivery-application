@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Smokit – Food Delivered Fast</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+body{background:#F5F5F5;color:#1A1A1A;}
+button,input,select,textarea{font-family:inherit;}
+img{display:block;object-fit:cover;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:#FFAA55;border-radius:4px;}
+
+/* Layout */
+#app{min-height:100vh;}
+.page{display:none;padding-top:60px;min-height:100vh;}
+.page.active{display:block;}
+#page-login{display:none;padding-top:0;}
+#page-login.active{display:flex;min-height:100vh;align-items:center;justify-content:center;background:linear-gradient(135deg,#0D0D0D,#2A2A2A);}
+
+/* Navbar */
+#navbar{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;background:rgba(255,255,255,0.95);backdrop-filter:blur(16px);border-bottom:1px solid #E8E8E8;display:flex;align-items:center;justify-content:space-between;padding:0 20px;}
+.logo{display:flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none;}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#FF7B00,#FF9F40);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.logo-text{font-weight:800;font-size:20px;color:#0D0D0D;letter-spacing:-0.5px;}
+.nav-right{display:flex;gap:10px;align-items:center;}
+
+/* Buttons */
+.btn{background:linear-gradient(135deg,#FF7B00,#FF9F40);color:white;border:none;cursor:pointer;border-radius:12px;padding:9px 18px;font-weight:700;font-size:13px;transition:all 0.2s;}
+.btn:hover{opacity:0.9;transform:translateY(-1px);}
+.btn:active{transform:translateY(0);}
+.btn-dark{background:#1A1A1A;}
+.btn-outline{background:white;color:#666;border:2px solid #E8E8E8;}
+.btn-outline:hover{border-color:#FF7B00;color:#FF7B00;}
+.btn-red-outline{background:white;color:#ef4444;border:2px solid #fecaca;width:100%;margin-top:14px;padding:11px;}
+.btn-full{width:100%;padding:13px;}
+.btn-lg{padding:14px 24px;font-size:15px;}
+
+/* Cards */
+.card{background:white;border-radius:18px;box-shadow:0 2px 16px rgba(0,0,0,0.08);overflow:hidden;}
+
+/* Notification */
+#notif{position:fixed;top:68px;right:16px;z-index:9999;background:#1A1A1A;color:white;padding:12px 20px;border-radius:14px;font-size:13px;font-weight:500;display:none;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,0.3);max-width:300px;}
+#notif.show{display:flex;}
+
+/* Hero sections */
+.hero{background:linear-gradient(135deg,#0D0D0D,#2A2A2A);color:white;padding:32px 20px 28px;}
+.hero-tag{display:inline-block;background:rgba(255,123,0,0.2);color:#FF9F40;border-radius:99px;padding:4px 14px;font-size:12px;font-weight:600;margin-bottom:10px;}
+.hero h1{font-weight:800;font-size:26px;line-height:1.3;margin-bottom:8px;}
+.hero p{color:#888;font-size:14px;margin-bottom:20px;}
+.accent{color:#FF9F40;}
+
+/* Search bar */
+.search-row{display:flex;gap:10px;}
+.search-wrap{flex:1;position:relative;}
+.search-wrap span{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:15px;}
+.search-wrap input{width:100%;padding:13px 14px 13px 42px;border-radius:14px;border:none;font-size:14px;outline:none;}
+.search-wrap input:focus{box-shadow:0 0 0 2px #FF9F40;}
+
+/* Categories */
+.cats{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:18px;scrollbar-width:none;}
+.cats::-webkit-scrollbar{display:none;}
+.cat-btn{flex-shrink:0;border:2px solid #E8E8E8;border-radius:20px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;background:white;color:#444;display:flex;align-items:center;gap:5px;transition:all 0.2s;white-space:nowrap;}
+.cat-btn.active,.cat-btn:hover{background:#FF7B00;color:white;border-color:#FF7B00;}
+
+/* Promos */
+.promos{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px;}
+.promo{border-radius:14px;padding:13px 14px;color:white;display:flex;align-items:center;gap:10px;cursor:pointer;}
+.promo-icon{font-size:24px;}
+.promo h4{font-weight:700;font-size:12px;}
+.promo p{font-size:10px;opacity:0.9;}
+
+/* Restaurant grid */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.section-header h2{font-weight:700;font-size:17px;}
+.section-header span{color:#888;font-weight:400;font-size:13px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;}
+.rest-card{cursor:pointer;transition:all 0.25s;border-radius:18px;overflow:hidden;background:white;box-shadow:0 2px 16px rgba(0,0,0,0.08);}
+.rest-card:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(0,0,0,0.13);}
+.rest-img{height:150px;position:relative;overflow:hidden;}
+.rest-img img{width:100%;height:100%;transition:transform 0.3s;}
+.rest-card:hover .rest-img img{transform:scale(1.05);}
+.rest-img-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.3),transparent 60%);}
+.rest-offer{position:absolute;bottom:10px;left:10px;background:white;border-radius:7px;padding:3px 9px;font-size:10px;font-weight:700;color:#E56A00;}
+.rest-tags{position:absolute;top:10px;right:10px;display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;}
+.tag{background:rgba(255,123,0,0.9);color:white;border-radius:99px;padding:2px 8px;font-size:9px;font-weight:600;}
+.rest-info{padding:12px 14px;}
+.rest-name{font-weight:700;font-size:14px;color:#0D0D0D;}
+.rest-cuisine{color:#888;font-size:11px;margin-top:2px;}
+.rest-meta{display:flex;gap:7px;margin-top:9px;padding-top:8px;border-top:1px solid #F5F5F5;font-size:11px;color:#888;flex-wrap:wrap;}
+.rating-badge{background:#22c55e;color:white;border-radius:6px;padding:3px 7px;font-size:11px;font-weight:700;}
+
+/* Food card */
+.food-card{background:white;border-radius:16px;padding:14px;display:flex;gap:12px;box-shadow:0 2px 10px rgba(0,0,0,0.06);}
+.food-info{flex:1;}
+.veg-dot{width:16px;height:16px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.veg-dot span{width:8px;height:8px;border-radius:50%;display:block;}
+.food-name{font-weight:700;font-size:14px;color:#0D0D0D;margin-top:5px;}
+.food-price{font-weight:700;font-size:13px;color:#FF7B00;margin:3px 0;}
+.food-desc{font-size:11px;color:#888;line-height:1.5;}
+.food-sub{display:flex;gap:8px;margin-top:6px;font-size:11px;color:#B0B0B0;}
+.food-right{display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0;}
+.food-thumb{width:84px;height:84px;border-radius:13px;overflow:hidden;}
+.food-thumb img{width:100%;height:100%;}
+.add-btn{border:2px solid #FF7B00;color:#FF7B00;background:white;border-radius:9px;padding:5px 16px;font-weight:700;font-size:12px;cursor:pointer;transition:all 0.15s;}
+.add-btn:hover{background:#FF7B00;color:white;}
+.qty-ctrl{display:flex;align-items:center;border:2px solid #FF7B00;border-radius:9px;overflow:hidden;}
+.qty-ctrl button{width:30px;height:30px;border:none;background:white;color:#FF7B00;font-weight:700;font-size:15px;cursor:pointer;}
+.qty-ctrl button:hover{background:#FFF8F0;}
+.qty-ctrl span{color:#FF7B00;font-weight:700;font-size:13px;padding:0 6px;}
+.bestseller{background:#fef3c7;color:#92400e;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;}
+
+/* Cart */
+.bill-row{display:flex;justify-content:space-between;font-size:12px;color:#666;padding:7px 0;}
+.bill-total{display:flex;justify-content:space-between;font-weight:700;font-size:14px;color:#0D0D0D;padding-top:10px;border-top:1px solid #E8E8E8;margin-top:6px;}
+.free{color:#22c55e;font-weight:700;}
+
+/* Stepper */
+.stepper{display:flex;align-items:center;margin-bottom:20px;}
+.step-dot{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all 0.5s;position:relative;flex-shrink:0;}
+.step-dot.done{background:#FF7B00;box-shadow:0 4px 12px rgba(255,123,0,0.4);}
+.step-dot.delivered{background:#22c55e;box-shadow:0 4px 12px rgba(34,197,94,0.4);}
+.step-dot.pending{background:#E8E8E8;}
+.step-line{flex:1;height:2px;transition:background 0.5s;}
+.step-line.done{background:#FF7B00;}
+.step-line.pending{background:#E8E8E8;}
+.step-label{font-size:9px;font-weight:600;text-align:center;max-width:52px;line-height:1.3;margin-top:4px;}
+
+/* Map */
+.map-box{height:260px;position:relative;overflow:hidden;background:#e8f0e8;}
+.map-svg{position:absolute;inset:0;width:100%;height:100%;}
+.map-pin{position:absolute;display:flex;flex-direction:column;align-items:center;z-index:10;transform:translate(-50%,-100%);}
+.map-pin-label{border-radius:7px;padding:3px 8px;font-size:9px;font-weight:700;margin-bottom:4px;white-space:nowrap;}
+.map-pin-circle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;font-size:16px;}
+
+/* Animations */
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,123,0,0.4);}50%{box-shadow:0 0 0 8px rgba(255,123,0,0);}}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+@keyframes bikeMove{from{left:7%;}to{left:86%;}}
+.pulse{animation:pulse 1.5s infinite;}
+.bike-anim{position:absolute;top:50%;transform:translateY(-68%);z-index:20;display:flex;flex-direction:column;align-items:center;transition:left 0.12s linear;}
+
+/* Chat */
+#cc-panel{position:fixed;bottom:84px;right:14px;width:340px;height:440px;background:white;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.2);display:none;flex-direction:column;overflow:hidden;z-index:200;}
+#cc-panel.open{display:flex;}
+#cc-fab{position:fixed;bottom:18px;right:14px;z-index:200;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#FF7B00,#FF9F40);border:none;cursor:pointer;font-size:22px;box-shadow:0 4px 20px rgba(255,123,0,0.5);}
+.cc-header{background:linear-gradient(135deg,#E56A00,#FF7B00);padding:12px 14px;flex-shrink:0;}
+.cc-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:9px;}
+.cc-bubble{max-width:83%;padding:9px 12px;font-size:12px;line-height:1.5;}
+.cc-bot{background:#F5F5F5;border-radius:16px 16px 16px 3px;align-self:flex-start;color:#1A1A1A;}
+.cc-user{background:linear-gradient(135deg,#FF7B00,#FF9F40);border-radius:16px 16px 3px 16px;align-self:flex-end;color:white;}
+.cc-quick-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+.cc-q{background:white;border:1.5px solid #FF9F40;color:#FF7B00;border-radius:18px;padding:4px 10px;font-size:10px;cursor:pointer;font-family:inherit;}
+.cc-q:hover{background:#FF7B00;color:white;}
+.cc-typing{display:flex;gap:4px;padding:8px 12px;background:#F5F5F5;border-radius:16px 16px 16px 3px;width:52px;}
+.cc-typing span{width:6px;height:6px;border-radius:50%;background:#B0B0B0;animation:bounce 1.2s ease-in-out infinite;}
+.cc-typing span:nth-child(2){animation-delay:0.2s;}
+.cc-typing span:nth-child(3){animation-delay:0.4s;}
+.cc-input-row{padding:8px 10px 12px;display:flex;gap:7px;align-items:center;border-top:1px solid #F5F5F5;flex-shrink:0;}
+.cc-input-row input{flex:1;border:1.5px solid #E8E8E8;border-radius:20px;padding:8px 14px;font-size:12px;outline:none;background:#FAFAFA;font-family:inherit;}
+.cc-input-row input:focus{border-color:#FF9F40;}
+.cc-send{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#FF7B00,#FF9F40);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cc-send:disabled{background:#E8E8E8;cursor:default;}
+
+/* Rating stars */
+.stars{display:flex;gap:6px;}
+.star-btn{background:none;border:none;cursor:pointer;padding:2px;font-size:0;transition:transform 0.15s;}
+.star-btn:hover,.star-btn.on{transform:scale(1.2);}
+.star-btn svg{display:block;}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:white;border-radius:24px 24px 0 0;width:100%;max-width:500px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;}
+.modal-handle{display:flex;justify-content:center;padding:12px 0 0;}
+.modal-handle div{width:40px;height:4px;background:#E8E8E8;border-radius:2px;}
+
+/* Profile tabs */
+.tabs{display:flex;background:white;border-radius:13px;padding:3px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.tab-btn{flex:1;padding:9px;border-radius:10px;border:none;font-weight:600;font-size:12px;cursor:pointer;font-family:inherit;transition:all 0.2s;}
+.tab-btn.active{background:#FF7B00;color:white;}
+.tab-btn:not(.active){background:transparent;color:#666;}
+
+/* Payment options */
+.pay-opt{display:flex;align-items:center;gap:12px;padding:11px 14px;border:2px solid #E8E8E8;border-radius:12px;cursor:pointer;transition:all 0.15s;margin-bottom:8px;}
+.pay-opt.selected{border-color:#FF7B00;background:#FFF8F0;}
+.pay-opt input{accent-color:#FF7B00;}
+
+/* Skeleton */
+.skel{background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);background-size:200% 100%;border-radius:12px;}
+
+/* Responsive */
+@media(max-width:600px){
+  .promos{grid-template-columns:1fr 1fr;}
+  .promos .promo:last-child{display:none;}
+  .grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+  .rest-img{height:120px;}
+  #cc-panel{width:calc(100vw - 28px);right:14px;}
+}
+@media(max-width:400px){
+  .grid{grid-template-columns:1fr;}
+}
+
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px;}
+.wrap-sm{max-width:680px;margin:0 auto;padding:20px 16px;}
+.wrap-md{max-width:860px;margin:0 auto;padding:20px 16px;}
+.two-col{display:grid;grid-template-columns:1fr 290px;gap:18px;align-items:start;}
+@media(max-width:700px){.two-col{grid-template-columns:1fr;}}
+.stack{display:flex;flex-direction:column;gap:10px;}
+.sticky-aside{position:sticky;top:68px;}
+
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:13px;font-weight:600;color:#444;margin-bottom:6px;}
+.field input,.field textarea,.field select{width:100%;border:2px solid #E8E8E8;border-radius:11px;padding:10px 13px;font-size:13px;outline:none;font-family:inherit;transition:border-color 0.2s;}
+.field input:focus,.field textarea:focus{border-color:#FF9F40;}
+.field .err{color:#ef4444;font-size:11px;margin-top:4px;}
+
+.flex-row{display:flex;align-items:center;gap:10px;}
+.gap-8{gap:8px;}
+.mt-4{margin-top:4px;}
+.mb-12{margin-bottom:12px;}
+.mb-16{margin-bottom:16px;}
+.mb-20{margin-bottom:20px;}
+.text-sm{font-size:13px;}
+.text-xs{font-size:11px;}
+.text-orange{color:#FF7B00;}
+.text-gray{color:#888;}
+.text-dark{color:#0D0D0D;}
+.fw-700{font-weight:700;}
+.fw-800{font-weight:800;}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/twemoji.min.js" crossorigin="anonymous" onerror="console.warn('Twemoji CDN unavailable - using system emoji')"></script>
+<style>
+img.emoji{height:1em;width:1em;vertical-align:-0.125em;display:inline-block;}
+
+/* ── Dark Mode ── */
+body.dark{background:#0F0F0F;color:#F0F0F0;}
+body.dark #navbar{background:rgba(20,20,20,0.97);border-bottom-color:#2A2A2A;}
+body.dark .logo-text{color:#F0F0F0;}
+body.dark .card{background:#1C1C1C;box-shadow:0 2px 16px rgba(0,0,0,0.4);}
+body.dark .rest-card{background:#1C1C1C;box-shadow:0 2px 16px rgba(0,0,0,0.4);}
+body.dark .rest-card:hover{box-shadow:0 14px 40px rgba(0,0,0,0.5);}
+body.dark .rest-name{color:#F0F0F0;}
+body.dark .rest-meta{border-top-color:#2A2A2A;}
+body.dark .food-card{background:#1C1C1C;box-shadow:0 2px 10px rgba(0,0,0,0.3);}
+body.dark .food-name{color:#F0F0F0;}
+body.dark .cat-btn{background:#1C1C1C;border-color:#2A2A2A;color:#CCC;}
+body.dark .cat-btn.active,.cat-btn:hover{background:#FF7B00;color:white;border-color:#FF7B00;}
+body.dark .section-header h2{color:#F0F0F0;}
+body.dark .search-wrap input{background:#1C1C1C;color:#F0F0F0;}
+body.dark select{background:#1C1C1C;color:#F0F0F0;border-color:#2A2A2A;}
+body.dark .btn-outline{background:#1C1C1C;color:#AAA;border-color:#333;}
+body.dark .btn-outline:hover{border-color:#FF7B00;color:#FF7B00;}
+body.dark .btn-dark{background:#FF7B00;}
+body.dark .tabs{background:#1C1C1C;}
+body.dark .tab-btn:not(.active){color:#AAA;}
+body.dark .pay-opt{border-color:#2A2A2A;}
+body.dark .pay-opt.selected{background:#1A0A00;border-color:#FF7B00;}
+body.dark .bill-row{color:#AAA;}
+body.dark .bill-total{color:#F0F0F0;border-top-color:#2A2A2A;}
+body.dark .modal-sheet{background:#1C1C1C;}
+body.dark .modal-handle div{background:#333;}
+body.dark .field label{color:#CCC;}
+body.dark .field input,.dark .field textarea,.dark .field select{background:#141414;border-color:#2A2A2A;color:#F0F0F0;}
+body.dark .field input:focus,.dark .field textarea:focus{border-color:#FF9F40;}
+body.dark #cc-panel{background:#1C1C1C;}
+body.dark .cc-bot{background:#2A2A2A;color:#F0F0F0;}
+body.dark .cc-q{background:#1C1C1C;border-color:#FF9F40;color:#FF9F40;}
+body.dark .cc-input-row{border-top-color:#2A2A2A;}
+body.dark .cc-input-row input{background:#141414;border-color:#2A2A2A;color:#F0F0F0;}
+body.dark .skel{background:linear-gradient(90deg,#222 25%,#2A2A2A 50%,#222 75%);}
+body.dark .bestseller{background:#3a2a00;color:#fbbf24;}
+body.dark .qty-ctrl button{background:#1C1C1C;}
+body.dark .qty-ctrl button:hover{background:#2A1500;}
+body.dark .add-btn{background:#1C1C1C;}
+body.dark .map-box{background:#111a11;}
+body.dark .map-svg .block{fill:#1a2a1a;}
+body.dark .map-svg .road{fill:#2a2a2a;}
+body.dark #city-svg rect[fill="#e4edd8"]{fill:#111a11;}
+body.dark #city-svg rect[fill="#d8e8cc"],
+body.dark #city-svg rect[fill="#d0e0c4"]{fill:#1a2a1a;}
+body.dark #city-svg rect[fill="#c2d4b8"],
+body.dark #city-svg rect[fill="#b8cead"]{fill:#243024;}
+body.dark #city-svg rect[fill="#d2d2d2"],
+body.dark #city-svg rect[fill="#bcbcbc"],
+body.dark #city-svg rect[fill="#cacaca"],
+body.dark #city-svg rect[fill="#c8c8c8"],
+body.dark #city-svg rect[fill="#c0c0c0"],
+body.dark #city-svg rect[fill="#b8b8b8"],
+body.dark #city-svg rect[fill="#b0b0b0"]{fill:#383838;}
+body.dark #map-waiting{background:rgba(20,28,20,0.95);}
+body.dark #map-waiting p{color:#aaa;}
+body.dark .map-road{background:#374151;}
+body.dark #map-waiting{background:rgba(28,28,28,0.95);}
+body.dark #map-wait-txt{color:#AAA;}
+body.dark .step-dot.pending{background:#2A2A2A;}
+body.dark .step-line.pending{background:#2A2A2A;}
+body.dark .btn-red-outline{background:#1C1C1C;color:#ef4444;border-color:#4a1a1a;}
+body.dark #page-login.active{background:linear-gradient(135deg,#050505,#111);}
+
+/* Dark mode toggle button */
+#dark-toggle{background:none;border:2px solid #E8E8E8;border-radius:20px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:600;color:#444;transition:all 0.2s;display:flex;align-items:center;gap:5px;}
+#dark-toggle:hover{border-color:#FF7B00;color:#FF7B00;}
+body.dark #dark-toggle{border-color:#333;color:#CCC;background:#1C1C1C;}
+body.dark #dark-toggle:hover{border-color:#FF7B00;color:#FF9F40;}
+</style>
+</head>
+<body>
+
+<!-- Notification -->
+<div id="notif">✅ <span id="notif-text"></span></div>
+
+<!-- Navbar -->
+<nav id="navbar" style="display:none;">
+  <div class="logo" onclick="goPage('home')">
+    <div class="logo-icon">🔥</div>
+    <span class="logo-text">Smokit</span>
+  </div>
+  <div class="nav-right">
+    <button class="btn" id="nav-cart-btn" onclick="goPage('cart')" style="position:relative;display:flex;align-items:center;gap:6px;display:none;">
+      🛒 Cart
+      <span id="cart-badge" style="position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;border:2px solid white;"></span>
+    </button>
+    <button class="btn btn-dark" id="nav-user-btn" onclick="goPage('profile')" style="display:none;"></button>
+    <button id="dark-toggle" onclick="toggleDark()" title="Toggle dark mode">🌙 Dark</button>
+    <button class="btn" id="nav-signin-btn" onclick="goPage('login')">Sign In</button>
+  </div>
+</nav>
+
+<!-- ═══ LOGIN PAGE ═══ -->
+<div id="page-login" class="page">
+  <div class="card" style="width:100%;max-width:420px;padding:32px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;">
+      <div class="logo-icon">🔥</div>
+      <span style="font-weight:800;font-size:22px;">Smokit</span>
+    </div>
+    <h2 id="login-title" style="font-weight:800;font-size:22px;margin-bottom:6px;">Welcome back! 👋</h2>
+    <p id="login-sub" style="color:#888;font-size:13px;margin-bottom:22px;">Sign in to continue your food journey</p>
+    <div style="display:flex;background:#F5F5F5;border-radius:13px;padding:3px;margin-bottom:22px;">
+      <button id="tab-signin" onclick="toggleAuth(true)" style="flex:1;padding:9px;border:none;border-radius:10px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit;background:white;color:#0D0D0D;box-shadow:0 1px 4px rgba(0,0,0,0.1);">Sign In</button>
+      <button id="tab-signup" onclick="toggleAuth(false)" style="flex:1;padding:9px;border:none;border-radius:10px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit;background:transparent;color:#888;">Sign Up</button>
+    </div>
+    <div id="name-field" class="field" style="display:none;">
+      <label>Full Name</label>
+      <input id="inp-name" placeholder="John Doe"/>
+      <div class="err" id="err-name"></div>
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input id="inp-email" type="email" placeholder="you@example.com"/>
+      <div class="err" id="err-email"></div>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input id="inp-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()"/>
+      <div class="err" id="err-pass"></div>
+    </div>
+    <button class="btn btn-full btn-lg" id="auth-btn" onclick="doAuth()" style="margin-bottom:14px;">Sign In →</button>
+    <p style="text-align:center;font-size:13px;color:#888;">
+      <span id="auth-switch-txt">No account? </span>
+      <button onclick="toggleAuth(null)" style="background:none;border:none;color:#FF7B00;font-weight:700;cursor:pointer;font-family:inherit;" id="auth-switch-btn">Sign up</button>
+    </p>
+  </div>
+</div>
+
+<!-- ═══ HOME PAGE ═══ -->
+<div id="page-home" class="page" style="display:none;">
+  <div class="hero">
+    <div style="max-width:720px;margin:0 auto;">
+      <div class="hero-tag">🔥 Hot deals available</div>
+      <h1>Hungry? We've got <span class="accent">you covered.</span></h1>
+      <p>500+ restaurants · 30-min delivery · Real-time tracking</p>
+      <div class="search-row">
+        <div class="search-wrap">
+          <span>🔍</span>
+          <input id="home-search" placeholder="Search restaurants, cuisines..." oninput="renderRestaurants()"/>
+        </div>
+        <button class="btn" style="border-radius:14px;padding:0 22px;white-space:nowrap;">Search</button>
+      </div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="cats" id="cats"></div>
+    <div class="promos">
+      <div class="promo" style="background:linear-gradient(135deg,#f97316,#ef4444);">
+        <div class="promo-icon">⚡</div><div><h4>Lightning Deals</h4><p>Up to 60% off</p></div>
+      </div>
+      <div class="promo" style="background:linear-gradient(135deg,#22c55e,#16a34a);">
+        <div class="promo-icon">🆓</div><div><h4>Free Delivery</h4><p>On orders ₹299+</p></div>
+      </div>
+      <div class="promo" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);">
+        <div class="promo-icon">🎁</div><div><h4>Refer & Earn</h4><p>₹100 per friend</p></div>
+      </div>
+    </div>
+    <div class="section-header">
+      <h2>All Restaurants <span id="rest-count"></span></h2>
+      <select id="sort-sel" onchange="renderRestaurants()" style="border:2px solid #E8E8E8;border-radius:10px;padding:7px 11px;font-size:12px;outline:none;font-family:inherit;background:white;">
+        <option value="relevance">Relevance</option>
+        <option value="rating">Top Rated</option>
+        <option value="delivery">Fastest</option>
+        <option value="price">Free Delivery</option>
+      </select>
+    </div>
+    <div class="grid" id="rest-grid"></div>
+  </div>
+</div>
+
+<!-- ═══ RESTAURANT PAGE ═══ -->
+<div id="page-restaurant" class="page" style="display:none;">
+  <button onclick="goPage('home')" style="position:fixed;top:70px;left:12px;z-index:50;background:white;border:none;border-radius:50%;width:38px;height:38px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.15);font-size:17px;">←</button>
+  <div class="hero" id="rest-hero"></div>
+  <div style="max-width:860px;margin:0 auto;padding:18px 16px;">
+    <div style="position:relative;margin-bottom:12px;">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;">🔍</span>
+      <input id="menu-search" style="width:100%;border:2px solid #E8E8E8;border-radius:11px;padding:9px 13px 9px 34px;font-size:13px;outline:none;font-family:inherit;" placeholder="Search menu..." oninput="renderMenu()"/>
+    </div>
+    <div class="cats" id="menu-cats"></div>
+    <div class="stack" id="menu-grid"></div>
+  </div>
+</div>
+
+<!-- ═══ CART PAGE ═══ -->
+<div id="page-cart" class="page" style="display:none;">
+  <div class="wrap-md">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div>
+        <h1 style="font-weight:800;font-size:20px;" id="cart-title">Your Cart</h1>
+        <p style="color:#888;font-size:12px;" id="cart-sub"></p>
+      </div>
+      <button onclick="clearCart()" style="background:none;border:none;color:#ef4444;font-size:12px;cursor:pointer;padding:6px 10px;">Clear All</button>
+    </div>
+    <div class="two-col">
+      <div class="stack" id="cart-items"></div>
+      <div class="card sticky-aside" style="padding:18px;">
+        <h3 style="font-weight:700;font-size:15px;margin-bottom:14px;">Bill Summary</h3>
+        <div id="bill-rows"></div>
+        <button class="btn btn-full" onclick="goPage('checkout')" style="margin-top:4px;" id="checkout-btn">Checkout</button>
+        <p style="text-align:center;font-size:10px;color:#B0B0B0;margin-top:10px;">🔒 Safe & secure payments</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CHECKOUT PAGE ═══ -->
+<div id="page-checkout" class="page" style="display:none;">
+  <div class="wrap-md">
+    <h1 style="font-weight:800;font-size:20px;margin-bottom:18px;">Checkout</h1>
+    <div class="two-col">
+      <div>
+        <div class="card mb-16" style="padding:18px;">
+          <h3 style="font-weight:700;font-size:14px;margin-bottom:10px;">📍 Delivery Address</h3>
+          <div style="background:#F5F5F5;border-radius:11px;padding:12px;font-size:13px;color:#444;line-height:1.6;">
+            Flat 4B, Sunrise Apartments<br>Connaught Place, New Delhi - 110001
+          </div>
+          <p style="color:#B0B0B0;font-size:11px;margin-top:8px;">⏱ Estimated delivery: 30–40 min</p>
+        </div>
+        <div class="card mb-16" style="padding:18px;">
+          <h3 style="font-weight:700;font-size:14px;margin-bottom:12px;">💳 Payment Method</h3>
+          <label class="pay-opt selected" id="pay-upi" onclick="selectPay('upi')"><input type="radio" name="pay" checked> <span style="font-size:18px;">📱</span> <div><div style="font-weight:600;font-size:12px;">UPI</div><div style="font-size:10px;color:#888;">GPay, PhonePe, Paytm</div></div></label>
+          <label class="pay-opt" id="pay-card" onclick="selectPay('card')"><input type="radio" name="pay"> <span style="font-size:18px;">💳</span> <div><div style="font-weight:600;font-size:12px;">Credit/Debit Card</div><div style="font-size:10px;color:#888;">Visa, Mastercard, Rupay</div></div></label>
+          <label class="pay-opt" id="pay-cod" onclick="selectPay('cod')"><input type="radio" name="pay"> <span style="font-size:18px;">💵</span> <div><div style="font-weight:600;font-size:12px;">Cash on Delivery</div><div style="font-size:10px;color:#888;">Pay when delivered</div></div></label>
+          <label class="pay-opt" id="pay-wallet" onclick="selectPay('wallet')"><input type="radio" name="pay"> <span style="font-size:18px;">👛</span> <div><div style="font-weight:600;font-size:12px;">Smokit Wallet</div><div style="font-size:10px;color:#888;">Balance: ₹250</div></div></label>
+        </div>
+        <div class="card" style="padding:18px;">
+          <h3 style="font-weight:700;font-size:14px;margin-bottom:10px;">🛒 Items</h3>
+          <div id="checkout-items"></div>
+        </div>
+      </div>
+      <div class="card sticky-aside" style="padding:18px;">
+        <h3 style="font-weight:700;font-size:15px;margin-bottom:14px;">Price Breakdown</h3>
+        <div id="checkout-bill"></div>
+        <button class="btn btn-full" id="place-btn" onclick="placeOrder()" style="margin-top:4px;">Place Order</button>
+        <p style="text-align:center;font-size:10px;color:#B0B0B0;margin-top:10px;">🔒 Secured by 256-bit SSL</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TRACKING PAGE ═══ -->
+<div id="page-tracking" class="page" style="display:none;">
+  <div class="wrap-sm">
+    <div id="track-banner" class="card mb-16" style="padding:22px;text-align:center;color:white;background:linear-gradient(135deg,#16a34a,#15803d);">
+      <div style="font-size:40px;margin-bottom:8px;">✅</div>
+      <h2 style="font-weight:800;font-size:19px;margin-bottom:4px;">Order Confirmed!</h2>
+      <p id="track-banner-sub" style="opacity:0.85;font-size:12px;margin-bottom:4px;"></p>
+      <p id="track-eta" style="font-weight:600;font-size:13px;">Estimated: 30–40 min</p>
+    </div>
+    <div class="card mb-16" style="padding:18px 14px;">
+      <h3 style="font-weight:700;font-size:14px;margin-bottom:18px;">Live Order Status</h3>
+      <div class="stepper" id="stepper"></div>
+      <div id="step-labels" style="display:flex;justify-content:space-between;margin-top:0;padding:0 0px;"></div>
+    </div>
+    <div class="card mb-16" style="overflow:hidden;">
+      <div class="map-box" id="map-box">
+        <!-- Full SVG city map -->
+        <svg class="map-svg" viewBox="0 0 700 280" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" id="city-svg">
+
+          <!-- Sky/ground base -->
+          <rect width="700" height="280" fill="#e4edd8"/>
+
+          <!-- ── City blocks ── -->
+          <!-- Row 1 blocks (above H1 road y=64) -->
+          <rect x="0"   y="0"   width="106" height="60" fill="#d8e8cc"/>
+          <rect x="116" y="0"   width="170" height="60" fill="#d8e8cc"/>
+          <rect x="296" y="0"   width="120" height="60" fill="#d8e8cc"/>
+          <rect x="426" y="0"   width="154" height="60" fill="#d8e8cc"/>
+          <rect x="590" y="0"   width="110" height="60" fill="#d8e8cc"/>
+          <!-- Row 2 blocks (between H1 y=64 and H2 y=148) -->
+          <rect x="0"   y="74"  width="106" height="64" fill="#d0e0c4"/>
+          <rect x="116" y="74"  width="170" height="64" fill="#d0e0c4"/>
+          <rect x="296" y="74"  width="120" height="64" fill="#d0e0c4"/>
+          <rect x="426" y="74"  width="154" height="64" fill="#d0e0c4"/>
+          <rect x="590" y="74"  width="110" height="64" fill="#d0e0c4"/>
+          <!-- Row 3 blocks (between H2 y=148 and H3 y=218) -->
+          <rect x="0"   y="160" width="106" height="48" fill="#d8e8cc"/>
+          <rect x="116" y="160" width="170" height="48" fill="#d8e8cc"/>
+          <rect x="296" y="160" width="120" height="48" fill="#d8e8cc"/>
+          <rect x="426" y="160" width="154" height="48" fill="#d8e8cc"/>
+          <rect x="590" y="160" width="110" height="48" fill="#d8e8cc"/>
+          <!-- Row 4 blocks (below H3 y=218) -->
+          <rect x="0"   y="228" width="106" height="52" fill="#d0e0c4"/>
+          <rect x="116" y="228" width="170" height="52" fill="#d0e0c4"/>
+          <rect x="296" y="228" width="120" height="52" fill="#d0e0c4"/>
+          <rect x="426" y="228" width="154" height="52" fill="#d0e0c4"/>
+          <rect x="590" y="228" width="110" height="52" fill="#d0e0c4"/>
+
+          <!-- ── Buildings (subtle rectangles in blocks) ── -->
+          <rect x="12"  y="8"  width="38" height="28" rx="2" fill="#c2d4b8" opacity="0.7"/>
+          <rect x="55"  y="12" width="24" height="22" rx="2" fill="#b8cead" opacity="0.6"/>
+          <rect x="70"  y="8"  width="18" height="30" rx="2" fill="#c2d4b8" opacity="0.5"/>
+          <rect x="130" y="10" width="32" height="24" rx="2" fill="#c2d4b8" opacity="0.7"/>
+          <rect x="172" y="6"  width="44" height="36" rx="2" fill="#b8cead" opacity="0.6"/>
+          <rect x="224" y="12" width="28" height="22" rx="2" fill="#c2d4b8" opacity="0.5"/>
+          <rect x="256" y="8"  width="20" height="30" rx="2" fill="#c2d4b8" opacity="0.6"/>
+          <rect x="308" y="6"  width="36" height="32" rx="2" fill="#b8cead" opacity="0.7"/>
+          <rect x="352" y="10" width="22" height="26" rx="2" fill="#c2d4b8" opacity="0.5"/>
+          <rect x="380" y="8"  width="30" height="28" rx="2" fill="#c2d4b8" opacity="0.6"/>
+          <rect x="440" y="10" width="38" height="24" rx="2" fill="#b8cead" opacity="0.7"/>
+          <rect x="488" y="6"  width="26" height="32" rx="2" fill="#c2d4b8" opacity="0.5"/>
+          <rect x="520" y="12" width="36" height="20" rx="2" fill="#c2d4b8" opacity="0.6"/>
+          <rect x="564" y="8"  width="18" height="28" rx="2" fill="#b8cead" opacity="0.5"/>
+          <rect x="604" y="10" width="42" height="22" rx="2" fill="#c2d4b8" opacity="0.7"/>
+          <rect x="654" y="6"  width="28" height="32" rx="2" fill="#b8cead" opacity="0.6"/>
+          <!-- Row 2 buildings -->
+          <rect x="8"   y="82" width="44" height="30" rx="2" fill="#c2d4b8" opacity="0.6"/>
+          <rect x="58"  y="88" width="30" height="22" rx="2" fill="#b8cead" opacity="0.5"/>
+          <rect x="120" y="80" width="38" height="34" rx="2" fill="#c2d4b8" opacity="0.7"/>
+          <rect x="168" y="86" width="52" height="26" rx="2" fill="#b8cead" opacity="0.6"/>
+          <rect x="228" y="82" width="30" height="30" rx="2" fill="#c2d4b8" opacity="0.5"/>
+          <rect x="264" y="78" width="22" height="36" rx="2" fill="#c2d4b8" opacity="0.6"/>
+          <rect x="304" y="82" width="48" height="28" rx="2" fill="#b8cead" opacity="0.7"/>
+          <rect x="360" y="86" width="28" height="24" rx="2" fill="#c2d4b8" opacity="0.5"/>
+          <rect x="432" y="80" width="44" height="32" rx="2" fill="#c2d4b8" opacity="0.7"/>
+          <rect x="484" y="86" width="32" height="22" rx="2" fill="#b8cead" opacity="0.6"/>
+          <rect x="524" y="82" width="26" height="28" rx="2" fill="#c2d4b8" opacity="0.5"/>
+          <rect x="598" y="80" width="40" height="30" rx="2" fill="#b8cead" opacity="0.6"/>
+          <rect x="646" y="86" width="36" height="24" rx="2" fill="#c2d4b8" opacity="0.5"/>
+
+          <!-- ── Trees ── -->
+          <!-- Row 1 trees -->
+          <circle cx="92"  cy="22"  r="9"  fill="#94bb84" opacity="0.85"/>
+          <circle cx="86"  cy="32"  r="6"  fill="#7aaa68" opacity="0.7"/>
+          <circle cx="200" cy="18"  r="11" fill="#94bb84" opacity="0.8"/>
+          <circle cx="214" cy="30"  r="7"  fill="#7aaa68" opacity="0.7"/>
+          <circle cx="340" cy="22"  r="9"  fill="#94bb84" opacity="0.8"/>
+          <circle cx="400" cy="16"  r="10" fill="#7aaa68" opacity="0.75"/>
+          <circle cx="560" cy="24"  r="9"  fill="#94bb84" opacity="0.8"/>
+          <circle cx="548" cy="36"  r="6"  fill="#7aaa68" opacity="0.65"/>
+          <circle cx="640" cy="20"  r="8"  fill="#94bb84" opacity="0.75"/>
+          <circle cx="672" cy="30"  r="7"  fill="#7aaa68" opacity="0.65"/>
+          <!-- Row 2 trees -->
+          <circle cx="82"  cy="110" r="8"  fill="#94bb84" opacity="0.8"/>
+          <circle cx="70"  cy="122" r="5"  fill="#7aaa68" opacity="0.65"/>
+          <circle cx="196" cy="108" r="10" fill="#94bb84" opacity="0.75"/>
+          <circle cx="254" cy="116" r="7"  fill="#7aaa68" opacity="0.7"/>
+          <circle cx="400" cy="106" r="9"  fill="#94bb84" opacity="0.8"/>
+          <circle cx="390" cy="120" r="6"  fill="#7aaa68" opacity="0.65"/>
+          <circle cx="556" cy="110" r="8"  fill="#94bb84" opacity="0.75"/>
+          <circle cx="672" cy="104" r="10" fill="#7aaa68" opacity="0.7"/>
+          <!-- Row 3/4 trees -->
+          <circle cx="58"  cy="178" r="7"  fill="#94bb84" opacity="0.8"/>
+          <circle cx="180" cy="172" r="8"  fill="#7aaa68" opacity="0.7"/>
+          <circle cx="360" cy="180" r="9"  fill="#94bb84" opacity="0.75"/>
+          <circle cx="500" cy="174" r="7"  fill="#7aaa68" opacity="0.7"/>
+          <circle cx="648" cy="178" r="8"  fill="#94bb84" opacity="0.8"/>
+          <circle cx="80"  cy="248" r="9"  fill="#94bb84" opacity="0.75"/>
+          <circle cx="220" cy="244" r="7"  fill="#7aaa68" opacity="0.7"/>
+          <circle cx="380" cy="252" r="8"  fill="#94bb84" opacity="0.8"/>
+          <circle cx="550" cy="246" r="9"  fill="#7aaa68" opacity="0.7"/>
+          <circle cx="660" cy="250" r="7"  fill="#94bb84" opacity="0.75"/>
+
+          <!-- ── Vertical roads (painted on top) ── -->
+          <!-- V1 narrow side -->
+          <rect x="0"   y="0" width="10"  height="280" fill="#cacaca"/>
+          <!-- V2 left junction x=106 -->
+          <rect x="106" y="0" width="10"  height="280" fill="#c8c8c8"/>
+          <!-- V3 mid junction x=286 (main) -->
+          <rect x="283" y="0" width="13"  height="280" fill="#bcbcbc"/>
+          <line x1="289" y1="0" x2="289" y2="280" stroke="white" stroke-width="1.2" stroke-dasharray="14,10" opacity="0.55"/>
+          <!-- V4 right junction x=416 -->
+          <rect x="416" y="0" width="10"  height="280" fill="#c8c8c8"/>
+          <!-- V5 far right x=580 -->
+          <rect x="580" y="0" width="10"  height="280" fill="#c8c8c8"/>
+          <!-- V6 edge -->
+          <rect x="690" y="0" width="10"  height="280" fill="#cacaca"/>
+
+          <!-- ── Horizontal roads ── -->
+          <!-- H1: y=64 restaurant side road -->
+          <rect x="0" y="60"  width="700" height="14" fill="#d2d2d2"/>
+          <line x1="0" y1="67" x2="700" y2="67" stroke="white" stroke-width="1" stroke-dasharray="16,12" opacity="0.4"/>
+          <!-- H2: y=148 main road (wider, bike route) -->
+          <rect x="0" y="142" width="700" height="18" fill="#bcbcbc"/>
+          <line x1="0" y1="151" x2="700" y2="151" stroke="white" stroke-width="2"   stroke-dasharray="24,14" opacity="0.65"/>
+          <!-- H3: y=218 home side road -->
+          <rect x="0" y="214" width="700" height="14" fill="#d2d2d2"/>
+          <line x1="0" y1="221" x2="700" y2="221" stroke="white" stroke-width="1" stroke-dasharray="16,12" opacity="0.4"/>
+          <!-- Intersection patches (blend roads nicely) -->
+          <rect x="106" y="60"  width="10" height="14" fill="#c8c8c8"/>
+          <rect x="283" y="60"  width="13" height="14" fill="#c0c0c0"/>
+          <rect x="416" y="60"  width="10" height="14" fill="#c8c8c8"/>
+          <rect x="580" y="60"  width="10" height="14" fill="#c8c8c8"/>
+          <rect x="106" y="142" width="10" height="18" fill="#b8b8b8"/>
+          <rect x="283" y="142" width="13" height="18" fill="#b0b0b0"/>
+          <rect x="416" y="142" width="10" height="18" fill="#b8b8b8"/>
+          <rect x="580" y="142" width="10" height="18" fill="#b8b8b8"/>
+          <rect x="106" y="214" width="10" height="14" fill="#c8c8c8"/>
+          <rect x="283" y="214" width="13" height="14" fill="#c0c0c0"/>
+          <rect x="416" y="214" width="10" height="14" fill="#c8c8c8"/>
+          <rect x="580" y="214" width="10" height="14" fill="#c8c8c8"/>
+
+          <!-- ── Intersection dots (traffic-light style) ── -->
+          <circle cx="111" cy="67"  r="3" fill="#fbbf24" opacity="0.8"/>
+          <circle cx="289" cy="151" r="4" fill="#fbbf24" opacity="0.8"/>
+          <circle cx="421" cy="221" r="3" fill="#fbbf24" opacity="0.8"/>
+
+          <!-- ── Route highlight: Restaurant(16%,24%) → H1 right → V3 down → H2 right → V5 down → Home(83%,78%) ── -->
+          <!-- In SVG coords: rest≈(112,67) → (289,67) → (289,151) → (584,151) → (584,221) ≈ home -->
+          <polyline points="112,67 289,67 289,151 584,151 584,221"
+            fill="none" stroke="#FF7B00" stroke-width="3.5" stroke-dasharray="9,6"
+            opacity="0.8" stroke-linecap="round" stroke-linejoin="round" id="route-line"/>
+
+        </svg>
+
+        <!-- Restaurant pin: H1 road at V2 junction → SVG(112,67) → %=(16%, 24%) -->
+        <div class="map-pin" id="rest-pin" style="left:16%;top:24%;">
+          <div class="map-pin-label" style="background:#FF7B00;color:white;">🏪 Restaurant</div>
+          <div class="map-pin-circle" style="background:linear-gradient(135deg,#FF7B00,#FF9F40);box-shadow:0 3px 10px rgba(255,123,0,0.5);">🏪</div>
+        </div>
+
+        <!-- Home pin: H3 road at V5 junction → SVG(584,221) → %=(83.4%, 78.9%) -->
+        <div class="map-pin" id="home-pin" style="left:83.4%;top:78.9%;">
+          <div class="map-pin-label" style="background:#16a34a;color:white;">🏠 Your Home</div>
+          <div class="map-pin-circle" style="background:linear-gradient(135deg,#16a34a,#22c55e);box-shadow:0 3px 10px rgba(34,197,94,0.5);">🏠</div>
+        </div>
+
+        <!-- Bike element – positioned absolutely, rotated by JS -->
+        <div id="bike-el" style="position:absolute;left:16%;top:24%;display:none;transform:translate(-50%,-100%);transition:left 0.08s linear,top 0.08s linear;z-index:20;">
+          <div style="background:#1A1A1A;color:white;border-radius:7px;padding:2px 7px;font-size:9px;font-weight:600;margin-bottom:3px;white-space:nowrap;text-align:center;">Ravi 🏍️</div>
+          <div id="bike-svg-wrap" style="transition:transform 0.25s ease;">
+            <svg width="44" height="29" viewBox="0 0 80 52" fill="none">
+              <circle cx="18" cy="38" r="12" stroke="#1A1A1A" stroke-width="3" fill="white"/>
+              <circle cx="18" cy="38" r="5"  fill="#FF7B00"/>
+              <circle cx="62" cy="38" r="12" stroke="#1A1A1A" stroke-width="3" fill="white"/>
+              <circle cx="62" cy="38" r="5"  fill="#FF7B00"/>
+              <path d="M18 38 L32 20 L50 20 L62 38" stroke="#2A2A2A" stroke-width="3" stroke-linecap="round" fill="none"/>
+              <rect x="28" y="17" width="16" height="5" rx="2.5" fill="#1A1A1A"/>
+              <path d="M55 20 L65 15" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M38 16 Q42 8 50 10 L54 18 Q46 20 38 16Z" fill="#FF7B00"/>
+              <circle cx="54" cy="9" r="7" fill="#FFDDB4"/>
+              <path d="M47 8 Q50 2 57 4 Q62 6 60 11 L56 10 Q57 6 54 5 Q50 5 49 8Z" fill="#FF7B00"/>
+              <rect x="22" y="14" width="14" height="10" rx="2" fill="#FF9F40"/>
+              <text x="29" y="22" text-anchor="middle" font-size="6" fill="white" font-weight="bold">SK</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Waiting overlay -->
+        <div id="map-waiting" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.93);border-radius:12px;padding:9px 14px;text-align:center;z-index:25;">
+          <div style="font-size:20px;">⏳</div>
+          <p id="map-wait-txt" style="font-size:11px;color:#666;margin-top:3px;font-weight:500;">Waiting for restaurant...</p>
+        </div>
+        <!-- ETA pill -->
+        <div id="map-eta-pill" style="display:none;position:absolute;top:8px;left:50%;transform:translateX(-50%);background:white;border-radius:20px;padding:5px 13px;font-size:11px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,0.1);z-index:15;white-space:nowrap;"></div>
+      </div>      </div>
+      <div id="delivery-partner" style="display:none;padding:12px 14px;border-top:1px solid #F5F5F5;display:none;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:38px;height:38px;background:linear-gradient(135deg,#1A1A1A,#444);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;">R</div>
+          <div>
+            <div style="font-weight:600;font-size:13px;color:#0D0D0D;">Ravi Kumar</div>
+            <div style="font-size:11px;color:#888;">⭐ 4.8 · 2,430 deliveries</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:7px;" id="partner-actions">
+          <button style="width:34px;height:34px;border-radius:50%;background:#FFF8F0;border:1.5px solid #FFD9B3;cursor:pointer;font-size:15px;">📞</button>
+          <button style="width:34px;height:34px;border-radius:50%;background:#FFF8F0;border:1.5px solid #FFD9B3;cursor:pointer;font-size:15px;">💬</button>
+        </div>
+      </div>
+    </div>
+    <div class="card mb-16" style="padding:14px;">
+      <h3 style="font-weight:700;font-size:14px;margin-bottom:10px;">Order Details</h3>
+      <div id="track-items"></div>
+      <div style="border-top:1px solid #F5F5F5;margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;font-weight:700;font-size:13px;" id="track-total"></div>
+    </div>
+    <div id="track-footer"></div>
+  </div>
+</div>
+
+<!-- ═══ PROFILE PAGE ═══ -->
+<div id="page-profile" class="page" style="display:none;">
+  <div class="wrap-sm">
+    <div style="background:linear-gradient(135deg,#0D0D0D,#2A2A2A);border-radius:20px;padding:22px;color:white;margin-bottom:16px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-20px;right:-20px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,0.04);"></div>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div id="prof-avatar" style="width:54px;height:54px;background:linear-gradient(135deg,#FF7B00,#FF9F40);border-radius:13px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;"></div>
+        <div>
+          <h2 id="prof-name" style="font-weight:800;font-size:18px;"></h2>
+          <p id="prof-email" style="color:#888;font-size:12px;margin-top:2px;"></p>
+        </div>
+      </div>
+      <div style="display:flex;gap:22px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);">
+        <div><div id="prof-orders-count" style="font-weight:700;font-size:18px;"></div><div style="color:#666;font-size:10px;">Orders</div></div>
+        <div><div id="prof-spent" style="font-weight:700;font-size:18px;"></div><div style="color:#666;font-size:10px;">Total Spent</div></div>
+        <div><div style="font-weight:700;font-size:18px;">⭐ 4.9</div><div style="color:#666;font-size:10px;">Your Rating</div></div>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('orders')">📋 My Orders</button>
+      <button class="tab-btn" onclick="switchTab('profile')">👤 Profile</button>
+      <button class="tab-btn" onclick="switchTab('addresses')">📍 Addresses</button>
+    </div>
+    <div id="tab-content"></div>
+  </div>
+</div>
+
+<!-- Rating Modal -->
+<div class="modal-overlay" id="rating-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"><div></div></div>
+    <div style="padding:14px 20px 10px;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <h2 style="font-weight:800;font-size:19px;">Rate Your Order</h2>
+        <p id="rating-sub" style="font-size:11px;color:#888;margin-top:2px;"></p>
+      </div>
+      <button onclick="closeRating()" style="width:30px;height:30px;border-radius:50%;background:#F5F5F5;border:none;cursor:pointer;font-size:15px;font-family:inherit;">✕</button>
+    </div>
+    <div style="display:flex;background:#F5F5F5;border-radius:12px;padding:3px;margin:0 20px 14px;">
+      <button id="rating-tab-food" onclick="switchRatingTab('food')" style="flex:1;padding:8px;border-radius:10px;border:none;cursor:pointer;font-weight:600;font-size:12px;font-family:inherit;background:white;color:#FF7B00;">🍔 Food</button>
+      <button id="rating-tab-delivery" onclick="switchRatingTab('delivery')" style="flex:1;padding:8px;border-radius:10px;border:none;cursor:pointer;font-weight:600;font-size:12px;font-family:inherit;background:transparent;color:#888;">🛵 Delivery</button>
+    </div>
+    <div id="rating-body" style="flex:1;overflow-y:auto;padding:0 20px 20px;"></div>
+  </div>
+</div>
+
+<!-- Customer Care -->
+<div id="cc-panel">
+  <div class="cc-header">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:9px;">
+        <div style="width:34px;height:34px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;">🤖</div>
+        <div>
+          <div style="color:white;font-weight:700;font-size:13px;">Smokit Support</div>
+          <div style="color:rgba(255,255,255,0.85);font-size:10px;">● Online · &lt;1 min reply</div>
+        </div>
+      </div>
+      <button onclick="toggleCC()" style="background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;color:white;font-size:16px;display:flex;align-items:center;justify-content:center;font-family:inherit;">×</button>
+    </div>
+  </div>
+  <div class="cc-msgs" id="cc-msgs"></div>
+  <div class="cc-input-row">
+    <input id="cc-inp" placeholder="Type a message..." onkeydown="if(event.key==='Enter')ccSend()"/>
+    <button class="cc-send" id="cc-send-btn" onclick="ccSend()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</div>
+<button id="cc-fab" onclick="toggleCC()">💬</button>
+
+<script>
+// ═══ DATA ═══
+const RESTAURANTS=[
+  {id:1,name:"Smoke & Sizzle",cuisine:"BBQ • American • Burgers",rating:4.6,reviews:2840,deliveryTime:"25-35 min",deliveryFee:29,minOrder:150,distance:"1.2 km",offer:"50% OFF upto ₹100",image:"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=80",tags:["Bestseller","Pure Veg"],category:"burgers",priceRange:"$$"},
+  {id:2,name:"Sushi Sensei",cuisine:"Japanese • Sushi • Asian",rating:4.8,reviews:1920,deliveryTime:"35-45 min",deliveryFee:0,minOrder:300,distance:"2.4 km",offer:"FREE DELIVERY",image:"https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600&q=80",tags:["Trending"],category:"asian",priceRange:"$$$"},
+  {id:3,name:"Pizzeria Roma",cuisine:"Italian • Pizza • Pasta",rating:4.4,reviews:3210,deliveryTime:"20-30 min",deliveryFee:19,minOrder:200,distance:"0.8 km",offer:"Buy 1 Get 1",image:"https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80",tags:["Bestseller"],category:"pizza",priceRange:"$$"},
+  {id:4,name:"Curry Kingdom",cuisine:"North Indian • Mughlai • Biryani",rating:4.5,reviews:5430,deliveryTime:"30-40 min",deliveryFee:0,minOrder:250,distance:"1.8 km",offer:"20% OFF",image:"https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=600&q=80",tags:["Top Rated"],category:"indian",priceRange:"$$"},
+  {id:5,name:"Taco Loco",cuisine:"Mexican • Wraps • Burrito",rating:4.3,reviews:1120,deliveryTime:"20-30 min",deliveryFee:29,minOrder:150,distance:"1.1 km",offer:"₹50 OFF on ₹299",image:"https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&q=80",tags:["New"],category:"mexican",priceRange:"$"},
+  {id:6,name:"Green Bowl",cuisine:"Healthy • Salads • Smoothies",rating:4.7,reviews:890,deliveryTime:"15-25 min",deliveryFee:0,minOrder:200,distance:"0.5 km",offer:"FREE DELIVERY",image:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80",tags:["Healthy"],category:"healthy",priceRange:"$"},
+  {id:7,name:"Ramen Republic",cuisine:"Japanese • Ramen • Noodles",rating:4.6,reviews:2100,deliveryTime:"25-35 min",deliveryFee:19,minOrder:200,distance:"1.6 km",offer:"15% OFF",image:"https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&q=80",tags:["Trending","New"],category:"asian",priceRange:"$$"},
+  {id:8,name:"The Dessert Lab",cuisine:"Desserts • Waffles • Ice Cream",rating:4.9,reviews:3780,deliveryTime:"20-30 min",deliveryFee:0,minOrder:150,distance:"0.9 km",offer:"FREE DELIVERY",image:"https://images.unsplash.com/photo-1551024506-0bccd828d307?w=600&q=80",tags:["Bestseller","Top Rated"],category:"desserts",priceRange:"$$"},
+  {id:9,name:"Coastal Catch",cuisine:"Seafood • Grill • South Indian",rating:4.5,reviews:1450,deliveryTime:"30-40 min",deliveryFee:29,minOrder:300,distance:"2.2 km",offer:"25% OFF",image:"https://images.unsplash.com/photo-1615361200141-f45040f367be?w=600&q=80",tags:["New","Spicy"],category:"seafood",priceRange:"$$$"},
+];
+const FOOD_ITEMS={
+  1:[{id:101,name:"Smoky BBQ Burger",desc:"Double patty, smoked cheddar, caramelized onions, BBQ sauce",price:229,rating:4.7,cat:"Burgers",veg:false,best:true,image:"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80",prep:"15 min"},{id:102,name:"Crispy Chicken Wings",desc:"12 pcs honey-glazed wings, celery sticks, ranch dip",price:349,rating:4.5,cat:"Starters",veg:false,best:true,image:"https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=80",prep:"20 min"},{id:103,name:"Loaded Fries",desc:"Thick-cut fries, nacho cheese, jalapeños, sour cream",price:189,rating:4.4,cat:"Sides",veg:true,best:false,image:"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=80",prep:"10 min"},{id:104,name:"Mushroom Swiss Burger",desc:"Portobello mushroom, Swiss cheese, garlic aioli",price:199,rating:4.3,cat:"Burgers",veg:true,best:false,image:"https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=400&q=80",prep:"15 min"},{id:105,name:"Chocolate Lava Cake",desc:"Warm chocolate cake, vanilla ice cream, chocolate drizzle",price:149,rating:4.8,cat:"Desserts",veg:true,best:false,image:"https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400&q=80",prep:"12 min"}],
+  2:[{id:201,name:"Dragon Roll",desc:"8 pcs, shrimp tempura, avocado, spicy mayo",price:499,rating:4.9,cat:"Rolls",veg:false,best:true,image:"https://images.unsplash.com/photo-1617196034738-26c5f7c977ce?w=400&q=80",prep:"20 min"},{id:202,name:"Salmon Nigiri",desc:"6 pcs fresh Atlantic salmon over seasoned sushi rice",price:399,rating:4.8,cat:"Nigiri",veg:false,best:false,image:"https://images.unsplash.com/photo-1582450871972-ab5ca641643d?w=400&q=80",prep:"15 min"},{id:203,name:"Miso Ramen",desc:"Rich miso broth, chashu pork, soft-boiled egg, nori",price:349,rating:4.7,cat:"Ramen",veg:false,best:true,image:"https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=400&q=80",prep:"25 min"}],
+  3:[{id:301,name:"Margherita Pizza",desc:"San Marzano tomatoes, fresh mozzarella, basil",price:299,rating:4.5,cat:"Pizza",veg:true,best:false,image:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&q=80",prep:"18 min"},{id:302,name:"Pepperoni Feast",desc:"Double pepperoni, mozzarella, tomato sauce",price:379,rating:4.7,cat:"Pizza",veg:false,best:true,image:"https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80",prep:"20 min"},{id:303,name:"Pasta Carbonara",desc:"Spaghetti, guanciale, eggs, Pecorino Romano",price:329,rating:4.6,cat:"Pasta",veg:false,best:false,image:"https://images.unsplash.com/photo-1612874742237-6526221588e3?w=400&q=80",prep:"15 min"},{id:304,name:"Truffle Mushroom Pizza",desc:"White truffle oil, mixed mushrooms, ricotta, arugula",price:449,rating:4.8,cat:"Pizza",veg:true,best:true,image:"https://images.unsplash.com/photo-1528137871618-79d2761e3fd5?w=400&q=80",prep:"22 min"}],
+  4:[{id:401,name:"Chicken Biryani",desc:"Aromatic basmati rice, tender chicken, fried onions",price:299,rating:4.8,cat:"Biryani",veg:false,best:true,image:"https://images.unsplash.com/photo-1563379091339-03246963d61a?w=400&q=80",prep:"30 min"},{id:402,name:"Butter Chicken",desc:"Tender chicken in rich tomato-cream sauce, naan",price:279,rating:4.7,cat:"Mains",veg:false,best:true,image:"https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400&q=80",prep:"20 min"},{id:403,name:"Paneer Tikka",desc:"Chargrilled paneer, capsicum, onion, mint chutney",price:229,rating:4.6,cat:"Starters",veg:true,best:false,image:"https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400&q=80",prep:"18 min"},{id:404,name:"Dal Makhani",desc:"Slow-cooked black lentils, cream, butter, spices",price:199,rating:4.5,cat:"Mains",veg:true,best:false,image:"https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=400&q=80",prep:"25 min"},{id:405,name:"Garlic Naan",desc:"Soft leavened bread, garlic, butter, tandoor baked",price:59,rating:4.4,cat:"Breads",veg:true,best:false,image:"https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80",prep:"8 min"}],
+  5:[{id:501,name:"Carne Asada Tacos",desc:"3 tacos, grilled steak, pico de gallo, guacamole",price:249,rating:4.5,cat:"Tacos",veg:false,best:true,image:"https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&q=80",prep:"15 min"},{id:502,name:"Chicken Burrito Bowl",desc:"Rice, black beans, grilled chicken, salsa, cheese",price:299,rating:4.4,cat:"Bowls",veg:false,best:false,image:"https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=400&q=80",prep:"12 min"},{id:503,name:"Veggie Quesadilla",desc:"Flour tortilla, roasted veggies, pepper jack cheese",price:199,rating:4.3,cat:"Quesadillas",veg:true,best:false,image:"https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=400&q=80",prep:"10 min"}],
+  6:[{id:601,name:"Superfood Salad",desc:"Kale, quinoa, roasted chickpeas, avocado, tahini",price:279,rating:4.7,cat:"Salads",veg:true,best:true,image:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80",prep:"10 min"},{id:602,name:"Acai Bowl",desc:"Blended acai, banana, granola, fresh berries, honey",price:249,rating:4.8,cat:"Bowls",veg:true,best:false,image:"https://images.unsplash.com/photo-1590301157890-4810ed352733?w=400&q=80",prep:"8 min"},{id:603,name:"Green Detox Smoothie",desc:"Spinach, cucumber, apple, ginger, lemon",price:179,rating:4.5,cat:"Drinks",veg:true,best:false,image:"https://images.unsplash.com/photo-1610970881699-44a5587cf6e7?w=400&q=80",prep:"5 min"}],
+
+  7:[{id:701,name:"Tonkotsu Ramen",desc:"Rich pork bone broth, chashu pork, soft egg, bamboo shoots",price:349,rating:4.8,cat:"Ramen",veg:false,best:true,image:"https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&q=80",prep:"20 min"},{id:702,name:"Spicy Tantanmen",desc:"Sesame-chilli broth, ground pork, bok choy, spring onion",price:369,rating:4.7,cat:"Ramen",veg:false,best:false,image:"https://images.unsplash.com/photo-1591814468924-caf88d1232e1?w=400&q=80",prep:"22 min"},{id:703,name:"Veggie Shoyu Ramen",desc:"Soy-based clear broth, tofu, corn, mushrooms, nori",price:299,rating:4.5,cat:"Ramen",veg:true,best:false,image:"https://images.unsplash.com/photo-1599522230628-1dc5ab0e0f7e?w=400&q=80",prep:"18 min"},{id:704,name:"Gyoza (8 pcs)",desc:"Pan-fried pork & cabbage dumplings, ponzu dipping sauce",price:199,rating:4.6,cat:"Starters",veg:false,best:true,image:"https://images.unsplash.com/photo-1629684782565-65a60a1f24de?w=400&q=80",prep:"12 min"},{id:705,name:"Matcha Ice Cream",desc:"House-made matcha soft serve, red bean paste, mochi",price:149,rating:4.9,cat:"Desserts",veg:true,best:false,image:"https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&q=80",prep:"5 min"}],
+  8:[{id:801,name:"Triple Choc Waffle",desc:"Belgian waffle, dark chocolate sauce, Nutella, choco chips",price:299,rating:4.9,cat:"Waffles",veg:true,best:true,image:"https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&q=80",prep:"12 min"},{id:802,name:"Creme Brulee",desc:"Classic vanilla custard with caramelised sugar crust",price:199,rating:4.8,cat:"Classics",veg:true,best:false,image:"https://images.unsplash.com/photo-1470324161839-ce2bb6fa6bc3?w=400&q=80",prep:"5 min"},{id:803,name:"Salted Caramel Sundae",desc:"3 scoops vanilla, house salted caramel, brownie crumble",price:249,rating:4.9,cat:"Ice Cream",veg:true,best:true,image:"https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&q=80",prep:"8 min"},{id:804,name:"Strawberry Cheesecake",desc:"NY-style baked cheesecake, fresh strawberry compote",price:229,rating:4.7,cat:"Cakes",veg:true,best:false,image:"https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&q=80",prep:"5 min"},{id:805,name:"Cookie Dough Shake",desc:"Thick vanilla milkshake, raw cookie dough bites, whipped cream",price:189,rating:4.8,cat:"Shakes",veg:true,best:false,image:"https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=400&q=80",prep:"7 min"}],
+  9:[{id:901,name:"Butter Garlic Prawns",desc:"Jumbo prawns, garlic butter, lemon, fresh herbs",price:449,rating:4.7,cat:"Starters",veg:false,best:true,image:"https://images.unsplash.com/photo-1615361200141-f45040f367be?w=400&q=80",prep:"18 min"},{id:902,name:"Grilled Pomfret",desc:"Whole pomfret, coastal masala, raw papaya salad",price:549,rating:4.6,cat:"Mains",veg:false,best:false,image:"https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&q=80",prep:"25 min"},{id:903,name:"Kerala Fish Curry",desc:"Kingfish in tangy coconut-tamarind gravy, steamed rice",price:379,rating:4.8,cat:"Mains",veg:false,best:true,image:"https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&q=80",prep:"20 min"},{id:904,name:"Crab Masala",desc:"Mud crab, onion-tomato masala, appam or rice",price:649,rating:4.7,cat:"Mains",veg:false,best:false,image:"https://images.unsplash.com/photo-1548943487-a2e4e43b4853?w=400&q=80",prep:"30 min"},{id:905,name:"Coconut Prawn Biryani",desc:"Fragrant basmati, tiger prawns, coconut milk, fried onions",price:399,rating:4.9,cat:"Biryani",veg:false,best:true,image:"https://images.unsplash.com/photo-1563379091339-03246963d61a?w=400&q=80",prep:"28 min"}],
+};
+const CATS=[{id:"all",label:"All",icon:"🍽️"},{id:"burgers",label:"Burgers",icon:"🍔"},{id:"pizza",label:"Pizza",icon:"🍕"},{id:"indian",label:"Indian",icon:"🍛"},{id:"asian",label:"Asian",icon:"🥢"},{id:"mexican",label:"Mexican",icon:"🌮"},{id:"healthy",label:"Healthy",icon:"🥗"},{id:"desserts",label:"Desserts",icon:"🍨"},{id:"seafood",label:"Seafood",icon:"🦞"}];
+
+// ═══ STATE ═══
+let user=null, cart=[], orders=[
+  {id:"ORD001",restaurant:"Smoke & Sizzle",items:["Smoky BBQ Burger","Loaded Fries"],total:418,status:"Delivered",date:"Feb 15, 2026",time:"7:30 PM"},
+  {id:"ORD002",restaurant:"Sushi Sensei",items:["Dragon Roll","Miso Ramen"],total:848,status:"Delivered",date:"Feb 12, 2026",time:"1:15 PM"},
+  {id:"ORD003",restaurant:"Curry Kingdom",items:["Chicken Biryani","Butter Chicken","Garlic Naan x2"],total:696,status:"Delivered",date:"Feb 8, 2026",time:"8:00 PM"},
+], currentPage="home", selectedRest=null, currentOrder=null;
+let activeCat="all", isLoginMode=true;
+let trackStep=0,bikePos=0,bikeInterval=null,stepTimers=[];
+let foodRating=0,delRating=0,ratingTab="food";
+
+// ═══ NOTIFY ═══
+function notify(msg){
+  document.getElementById('notif-text').textContent=msg;
+  const n=document.getElementById('notif');
+  n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'),3000);
+}
+
+// ═══ NAVIGATION ═══
+function goPage(p,data){
+  currentPage=p;
+  if(data)selectedRest=data;
+  document.querySelectorAll('.page').forEach(el=>{el.style.display='none';el.classList.remove('active');});
+  const el=document.getElementById('page-'+p);
+  if(el){el.style.display='';el.classList.add('active');}
+  document.getElementById('navbar').style.display=p==='login'?'none':'flex';
+  updateNav();
+  if(p==='home'){initCats();renderRestaurants();}
+  if(p==='restaurant'){renderRestaurant();}
+  if(p==='cart'){renderCart();}
+  if(p==='checkout'){renderCheckout();}
+  if(p==='tracking'){startTracking();}
+  if(p==='profile'){renderProfile();}
+  window.scrollTo(0,0);
+}
+
+function updateNav(){
+  const cartBtn=document.getElementById('nav-cart-btn');
+  const userBtn=document.getElementById('nav-user-btn');
+  const signBtn=document.getElementById('nav-signin-btn');
+  if(user){
+    cartBtn.style.display='flex';
+    userBtn.style.display='inline-block';
+    userBtn.textContent=user.name[0].toUpperCase()+' '+user.name.split(' ')[0];
+    signBtn.style.display='none';
+  } else {
+    cartBtn.style.display='none';
+    userBtn.style.display='none';
+    signBtn.style.display='inline-block';
+  }
+  const count=cart.reduce((s,i)=>s+i.qty,0);
+  const badge=document.getElementById('cart-badge');
+  if(count>0){badge.style.display='flex';badge.textContent=count;}
+  else{badge.style.display='none';}
+}
+
+// ═══ AUTH ═══
+function toggleAuth(mode){
+  if(mode===null)isLoginMode=!isLoginMode;
+  else isLoginMode=mode;
+  document.getElementById('login-title').textContent=isLoginMode?'Welcome back! 👋':'Create account 🎉';
+  document.getElementById('login-sub').textContent=isLoginMode?'Sign in to continue your food journey':'Join thousands of happy foodies';
+  document.getElementById('name-field').style.display=isLoginMode?'none':'block';
+  document.getElementById('auth-btn').textContent=isLoginMode?'Sign In →':'Create Account →';
+  document.getElementById('auth-switch-txt').textContent=isLoginMode?'No account? ':'Have an account? ';
+  document.getElementById('auth-switch-btn').textContent=isLoginMode?'Sign up':'Sign in';
+  document.getElementById('tab-signin').style.background=isLoginMode?'white':'transparent';
+  document.getElementById('tab-signin').style.color=isLoginMode?'#0D0D0D':'#888';
+  document.getElementById('tab-signup').style.background=isLoginMode?'transparent':'white';
+  document.getElementById('tab-signup').style.color=isLoginMode?'#888':'#0D0D0D';
+  ['err-name','err-email','err-pass'].forEach(id=>document.getElementById(id).textContent='');
+}
+
+function doAuth(){
+  const name=document.getElementById('inp-name').value.trim();
+  const email=document.getElementById('inp-email').value.trim();
+  const pass=document.getElementById('inp-pass').value;
+  let ok=true;
+  if(!isLoginMode&&!name){document.getElementById('err-name').textContent='Name is required';ok=false;}
+  if(!email.includes('@')){document.getElementById('err-email').textContent='Enter a valid email';ok=false;}
+  if(pass.length<6){document.getElementById('err-pass').textContent='Minimum 6 characters';ok=false;}
+  if(!ok)return;
+  const btn=document.getElementById('auth-btn');
+  btn.textContent='Please wait...';btn.disabled=true;
+  setTimeout(()=>{
+    user={name:name||email.split('@')[0],email};
+    btn.textContent=isLoginMode?'Sign In →':'Create Account →';btn.disabled=false;
+    goPage('home');
+  },900);
+}
+
+// ═══ HOME ═══
+function initCats(){
+  const el=document.getElementById('cats');
+  el.innerHTML=CATS.map(c=>`<button class="cat-btn${c.id===activeCat?' active':''}" onclick="setCat('${c.id}')">${c.icon} ${c.label}</button>`).join('');
+}
+function setCat(id){activeCat=id;initCats();renderRestaurants();}
+function renderRestaurants(){
+  const search=(document.getElementById('home-search')||{value:''}).value.toLowerCase();
+  const sort=(document.getElementById('sort-sel')||{value:'relevance'}).value;
+  let list=RESTAURANTS.filter(r=>{
+    const ms=r.name.toLowerCase().includes(search)||r.cuisine.toLowerCase().includes(search);
+    const mc=activeCat==='all'||r.category===activeCat;
+    return ms&&mc;
+  }).sort((a,b)=>{
+    if(sort==='rating')return b.rating-a.rating;
+    if(sort==='delivery')return parseInt(a.deliveryTime)-parseInt(b.deliveryTime);
+    if(sort==='price')return a.deliveryFee-b.deliveryFee;
+    return 0;
+  });
+  document.getElementById('rest-count').textContent='('+list.length+')';
+  document.getElementById('rest-grid').innerHTML=list.map(r=>`
+    <div class="rest-card" onclick="${user?`openRest(${r.id})`:'goPage(\'login\')'}">
+      <div class="rest-img">
+        <img src="${r.image}" alt="${r.name}" loading="lazy">
+        <div class="rest-img-overlay"></div>
+        ${r.offer?`<div class="rest-offer">🏷️ ${r.offer}</div>`:''}
+        <div class="rest-tags">${r.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      </div>
+      <div class="rest-info">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <div><div class="rest-name">${r.name}</div><div class="rest-cuisine">${r.cuisine}</div></div>
+          <span class="rating-badge">⭐ ${r.rating}</span>
+        </div>
+        <div class="rest-meta">
+          <span>⏱ ${r.deliveryTime}</span><span>·</span>
+          <span>${r.deliveryFee>0?'₹'+r.deliveryFee+' delivery':'🆓 Free'}</span><span>·</span>
+          <span>${r.priceRange}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+function openRest(id){selectedRest=RESTAURANTS.find(r=>r.id===id);goPage('restaurant');}
+
+// ═══ RESTAURANT PAGE ═══
+let menuCat='all';
+function renderRestaurant(){
+  const r=selectedRest;
+  document.getElementById('rest-hero').innerHTML=`
+    <div style="max-width:860px;margin:0 auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">
+      <div style="width:70px;height:70px;border-radius:13px;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,0.15);">
+        <img src="${r.image}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+      </div>
+      <div style="flex:1;min-width:180px;">
+        <div style="display:flex;gap:5px;margin-bottom:7px;flex-wrap:wrap;">
+          ${r.tags.map(t=>`<span style="background:rgba(255,123,0,0.2);color:#FF9F40;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:600;">${t}</span>`).join('')}
+        </div>
+        <h1 style="font-weight:800;font-size:21px;margin-bottom:3px;">${r.name}</h1>
+        <p style="color:#888;font-size:12px;margin-bottom:9px;">${r.cuisine}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:#888;align-items:center;">
+          <span class="rating-badge">⭐ ${r.rating}</span>
+          <span>${r.reviews.toLocaleString()} ratings</span>
+          <span>· ⏱ ${r.deliveryTime}</span>
+          <span>· 📍 ${r.distance}</span>
+        </div>
+        <div style="display:flex;gap:20px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.1);">
+          <div><div style="font-weight:700;font-size:14px;">${r.deliveryFee>0?'₹'+r.deliveryFee:'FREE'}</div><div style="color:#666;font-size:10px;">Delivery fee</div></div>
+          <div><div style="font-weight:700;font-size:14px;">₹${r.minOrder}</div><div style="color:#666;font-size:10px;">Min. order</div></div>
+          <div><div style="font-weight:700;font-size:14px;color:#FF9F40;">${r.offer}</div><div style="color:#666;font-size:10px;">Current offer</div></div>
+        </div>
+      </div>
+    </div>`;
+  menuCat='all';
+  renderMenu();
+}
+function renderMenu(){
+  const r=selectedRest;
+  const items=FOOD_ITEMS[r.id]||[];
+  const search=(document.getElementById('menu-search')||{value:''}).value.toLowerCase();
+  const cats=['all',...new Set(items.map(i=>i.cat))];
+  document.getElementById('menu-cats').innerHTML=cats.map(c=>`<button class="cat-btn${menuCat===c?' active':''}" onclick="setMenuCat('${c}')">${c==='all'?'🍽️ All':c}</button>`).join('');
+  const filtered=items.filter(i=>(menuCat==='all'||i.cat===menuCat)&&i.name.toLowerCase().includes(search));
+  document.getElementById('menu-grid').innerHTML=filtered.length?filtered.map(item=>foodCardHTML(item,r)).join(''):`<div style="text-align:center;padding:40px;color:#888;">No items found</div>`;
+}
+function setMenuCat(c){menuCat=c;renderMenu();}
+function foodCardHTML(item,r){
+  const qty=cart.find(c=>c.id===item.id)?.qty||0;
+  return `<div class="food-card" id="fc-${item.id}">
+    <div class="food-info">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;">
+        <div class="veg-dot" style="border:2px solid ${item.veg?'#22c55e':'#ef4444'};border-radius:3px;">
+          <span style="background:${item.veg?'#22c55e':'#ef4444'};"></span>
+        </div>
+        ${item.best?'<span class="bestseller">🏆 Bestseller</span>':''}
+      </div>
+      <div class="food-name">${item.name}</div>
+      <div class="food-price">₹${item.price}</div>
+      <div class="food-desc">${item.desc}</div>
+      <div class="food-sub"><span>⭐ ${item.rating}</span><span>·</span><span>⏱ ${item.prep}</span></div>
+    </div>
+    <div class="food-right">
+      <div class="food-thumb"><img src="${item.image}" alt="${item.name}" loading="lazy"></div>
+      <div id="qty-ctrl-${item.id}">${qtyHTML(item,qty)}</div>
+    </div>
+  </div>`;
+}
+function qtyHTML(item,qty){
+  if(qty===0)return `<button class="add-btn" onclick="addItem(${item.id})">ADD</button>`;
+  return `<div class="qty-ctrl">
+    <button onclick="removeItem(${item.id})">−</button>
+    <span>${qty}</span>
+    <button onclick="addItem(${item.id})">+</button>
+  </div>`;
+}
+function addItem(id){
+  const r=selectedRest;
+  const item=(FOOD_ITEMS[r.id]||[]).find(i=>i.id===id);
+  if(!item)return;
+  const ex=cart.find(c=>c.id===id);
+  if(ex)ex.qty++;
+  else cart.push({...item,qty:1,restaurantId:r.id,restaurantName:r.name});
+  const qty=cart.find(c=>c.id===id).qty;
+  const ctrl=document.getElementById('qty-ctrl-'+id);
+  if(ctrl)ctrl.innerHTML=qtyHTML(item,qty);
+  notify(item.name+' added!');
+  updateNav();
+}
+function removeItem(id){
+  const r=selectedRest;
+  const item=(FOOD_ITEMS[r.id]||[]).find(i=>i.id===id);
+  const ex=cart.find(c=>c.id===id);
+  if(!ex)return;
+  if(ex.qty>1)ex.qty--;
+  else cart=cart.filter(c=>c.id!==id);
+  const qty=cart.find(c=>c.id===id)?.qty||0;
+  const ctrl=document.getElementById('qty-ctrl-'+id);
+  if(ctrl)ctrl.innerHTML=qtyHTML(item,qty);
+  updateNav();
+}
+
+// ═══ CART ═══
+function cartTotal(){return cart.reduce((s,i)=>s+i.price*i.qty,0);}
+function cartFee(){return cart.length>0?(selectedRest?.deliveryFee??29):0;}
+function clearCart(){cart=[];renderCart();updateNav();}
+function renderCart(){
+  if(!cart.length){
+    document.getElementById('page-cart').innerHTML=`<div style="display:flex;align-items:center;justify-content:center;min-height:80vh;flex-direction:column;text-align:center;padding:40px;">
+      <div style="font-size:72px;margin-bottom:16px;">🛒</div>
+      <h2 style="font-weight:700;font-size:22px;margin-bottom:8px;">Your cart is empty</h2>
+      <p style="color:#888;margin-bottom:24px;">Looks like you haven't added anything yet</p>
+      <button class="btn btn-lg" onclick="goPage('home')">Browse Restaurants</button>
+    </div>`;return;
+  }
+  const fee=cartFee(),gst=Math.round(cartTotal()*0.05),total=cartTotal()+fee+gst;
+  document.getElementById('cart-title').textContent='Your Cart';
+  document.getElementById('cart-sub').textContent=cart.length+' item'+(cart.length>1?'s':'')+' from '+cart[0]?.restaurantName;
+  document.getElementById('cart-items').innerHTML=cart.map(item=>`
+    <div class="card" style="padding:13px 15px;display:flex;align-items:center;gap:12px;">
+      <div style="width:52px;height:52px;border-radius:11px;overflow:hidden;flex-shrink:0;">
+        <img src="${item.image}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+      </div>
+      <div style="flex:1;">
+        <div style="font-weight:600;font-size:13px;">${item.name}</div>
+        <div style="font-weight:700;font-size:12px;color:#FF7B00;margin-top:2px;">₹${item.price} × ${item.qty}</div>
+      </div>
+      <div class="qty-ctrl">
+        <button onclick="cartRemove(${item.id})">−</button>
+        <span>${item.qty}</span>
+        <button onclick="cartAdd(${item.id})">+</button>
+      </div>
+      <div style="font-weight:700;font-size:13px;min-width:44px;text-align:right;">₹${item.price*item.qty}</div>
+    </div>`).join('')+`<button class="btn-outline btn btn-full" style="margin-top:4px;" onclick="goPage('restaurant',selectedRest)">+ Add more items</button>`;
+  document.getElementById('bill-rows').innerHTML=billRows(fee,gst,total);
+  document.getElementById('checkout-btn').textContent=`Checkout · ₹${total}`;
+}
+function billRows(fee,gst,total){
+  return `<div class="bill-row"><span>Item total</span><span>₹${cartTotal()}</span></div>
+  <div class="bill-row"><span>Delivery</span><span class="${fee===0?'free':''}">${fee===0?'FREE':'₹'+fee}</span></div>
+  <div class="bill-row"><span>GST (5%)</span><span>₹${gst}</span></div>
+  <div class="bill-total"><span>Total</span><span>₹${total}</span></div>`;
+}
+function cartAdd(id){
+  const item=cart.find(c=>c.id===id);if(item)item.qty++;renderCart();updateNav();
+}
+function cartRemove(id){
+  const item=cart.find(c=>c.id===id);
+  if(!item)return;
+  if(item.qty>1)item.qty--;else cart=cart.filter(c=>c.id!==id);
+  renderCart();updateNav();
+}
+
+// ═══ CHECKOUT ═══
+function renderCheckout(){
+  const fee=cartFee(),gst=Math.round(cartTotal()*0.05),total=cartTotal()+fee+gst;
+  document.getElementById('checkout-items').innerHTML=cart.map(i=>`
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #F5F5F5;font-size:12px;">
+      <span style="color:#444;">${i.name} × ${i.qty}</span>
+      <span style="font-weight:600;">₹${i.price*i.qty}</span>
+    </div>`).join('');
+  document.getElementById('checkout-bill').innerHTML=billRows(fee,gst,total);
+  document.getElementById('place-btn').textContent=`Place Order · ₹${total}`;
+}
+function selectPay(id){
+  ['upi','card','cod','wallet'].forEach(p=>{
+    document.getElementById('pay-'+p).classList.toggle('selected',p===id);
+    document.getElementById('pay-'+p).querySelector('input').checked=p===id;
+  });
+}
+function placeOrder(){
+  const btn=document.getElementById('place-btn');
+  btn.textContent='Placing Order... ⏳';btn.disabled=true;
+  const fee=cartFee(),gst=Math.round(cartTotal()*0.05),total=cartTotal()+fee+gst;
+  setTimeout(()=>{
+    currentOrder={
+      id:'ORD'+String(orders.length+4).padStart(3,'0'),
+      restaurant:cart[0]?.restaurantName||'Restaurant',
+      items:cart.map(c=>c.name+(c.qty>1?' x'+c.qty:'')),
+      total,status:'Placed',
+      date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
+      time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),
+    };
+    orders.unshift(currentOrder);
+    cart=[];updateNav();
+    btn.textContent='Place Order';btn.disabled=false;
+    goPage('tracking');
+  },1400);
+}
+
+// ═══ TRACKING ═══
+function startTracking(){
+  trackStep=0;bikePos=0;const _bw=document.getElementById('bike-svg-wrap');if(_bw)_bw.style.transform='rotate(0deg)';
+  stepTimers.forEach(clearTimeout);if(bikeInterval)clearInterval(bikeInterval);
+  updateTrack();
+  stepTimers.push(setTimeout(()=>{trackStep=1;updateTrack();},2000));
+  stepTimers.push(setTimeout(()=>{trackStep=2;updateTrack();startBike();},5000));
+  document.getElementById('track-banner-sub').textContent='Order #'+currentOrder?.id+' · '+currentOrder?.restaurant;
+  document.getElementById('track-items').innerHTML=(currentOrder?.items||[]).map(i=>`<div style="font-size:12px;color:#666;padding:3px 0;display:flex;gap:5px;"><span style="color:#FF7B00;">•</span>${i}</div>`).join('');
+  document.getElementById('track-total').innerHTML='<span>Total Paid</span><span>₹'+currentOrder?.total+'</span>';
+  document.getElementById('track-footer').innerHTML=`<button class="btn btn-outline btn-full" onclick="goPage('home')">← Back to Home</button>`;
+}
+function startBike(){
+  // Route in % of map-box dimensions: [left%, top%]
+  // Matches SVG route: rest(16,24) → H1 right to V3(41.3,24) → V3 down to H2(41.3,53.6) → H2 right to V5(83.4,53.6) → V5 down to home(83.4,78.9)
+  const waypoints=[
+    [16,   24  ],   // 0: restaurant (start)
+    [41.3, 24  ],   // 1: H1→V3 junction (turn)
+    [41.3, 53.6],   // 2: V3→H2 junction (turn)
+    [83.4, 53.6],   // 3: H2→V5 junction (turn)
+    [83.4, 78.9]    // 4: home (end)
+  ];
+
+  // Direction angles: SVG bike faces RIGHT = 0°; DOWN = 90°; LEFT = 180°; UP = -90°
+  // Seg 0: right (+x) → 0deg
+  // Seg 1: down  (+y) → 90deg
+  // Seg 2: right (+x) → 0deg
+  // Seg 3: down  (+y) → 90deg
+  const segAngles=[0, 90, 0, 90];
+
+  // Build dense path with per-point angle info
+  const SPEED=0.32; // % per tick
+  const path=[];
+  for(let s=0;s<waypoints.length-1;s++){
+    const [x0,y0]=waypoints[s];
+    const [x1,y1]=waypoints[s+1];
+    const dist=Math.sqrt((x1-x0)**2+(y1-y0)**2);
+    const steps=Math.max(4,Math.round(dist/SPEED));
+    for(let t=0;t<steps;t++){
+      const r=t/steps;
+      path.push({x:x0+(x1-x0)*r, y:y0+(y1-y0)*r, angle:segAngles[s]});
+    }
+  }
+  path.push({x:waypoints[4][0], y:waypoints[4][1], angle:90});
+
+  let step=0;
+  let lastAngle=0;
+  const bikeSvgWrap=document.getElementById('bike-svg-wrap');
+
+  bikeInterval=setInterval(()=>{
+    if(step>=path.length){
+      clearInterval(bikeInterval);
+      setTimeout(()=>{trackStep=3;updateTrack();},600);
+      return;
+    }
+    const {x,y,angle}=path[step];
+    const pct=step/path.length;
+    const eta=Math.max(0,Math.round((1-pct)*12));
+
+    document.getElementById('track-eta').textContent='ETA: ~'+eta+' min';
+    const pill=document.getElementById('map-eta-pill');
+    if(pill){pill.style.display='block';pill.textContent='⏱ ETA: ~'+eta+' min';}
+
+    const bike=document.getElementById('bike-el');
+    if(bike){bike.style.left=x+'%';bike.style.top=y+'%';}
+
+    // Rotate the SVG wrapper so bike faces direction of travel
+    if(bikeSvgWrap && angle!==lastAngle){
+      // When going right (0°): normal
+      // When going down (90°): rotate svg 90° clockwise
+      bikeSvgWrap.style.transform='rotate('+angle+'deg)';
+      // Adjust label visibility for downward segments
+      const label=bike?bike.querySelector('div'):null;
+      if(label){label.style.display=angle===90?'none':'block';}
+      lastAngle=angle;
+    }
+    step++;
+  },75);
+}
+function updateTrack(){
+  const steps=['Order Placed','Preparing','On the Way','Delivered'];
+  const icons=['📋','👨‍🍳','🛵','✅'];
+  // Stepper
+  let stepHTML='';
+  steps.forEach((s,i)=>{
+    const cls=i<trackStep?'done':(i===trackStep&&trackStep<3?'done pulse':(i===3&&trackStep===3?'delivered':'pending'));
+    stepHTML+=`<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+      <div class="step-dot ${cls}">${icons[i]}</div>
+      <span style="font-size:9px;font-weight:600;text-align:center;max-width:50px;line-height:1.3;color:${i<=trackStep?'#FF7B00':'#B0B0B0'};">${s}</span>
+    </div>`;
+    if(i<steps.length-1)stepHTML+=`<div class="step-line ${i<trackStep?'done':'pending'}" style="margin-bottom:20px;"></div>`;
+  });
+  document.getElementById('stepper').innerHTML=stepHTML;
+  // Map
+  const waiting=document.getElementById('map-waiting');
+  const bike=document.getElementById('bike-el');
+  const partner=document.getElementById('delivery-partner');
+  const pill=document.getElementById('map-eta-pill');
+  if(trackStep<1){
+    if(waiting){waiting.style.display='block';document.getElementById('map-wait-txt').textContent='Waiting for restaurant...';}
+    if(bike)bike.style.display='none';
+    if(partner)partner.style.display='none';
+  } else if(trackStep===1){
+    if(waiting){waiting.style.display='block';document.getElementById('map-wait-txt').textContent='Preparing your order...';}
+    if(bike)bike.style.display='none';
+    if(partner)partner.style.display='none';
+  } else if(trackStep===2){
+    if(waiting)waiting.style.display='none';
+    if(bike){bike.style.display='flex';bike.style.left='16%';bike.style.top='24%';const w=document.getElementById('bike-svg-wrap');if(w)w.style.transform='rotate(0deg)';}
+    if(partner)partner.style.display='flex';
+    if(pill)pill.style.display='block';
+  } else if(trackStep===3){
+    if(waiting)waiting.style.display='none';
+    if(bike)bike.style.display='none';
+    if(pill){pill.style.background='#16a34a';pill.style.color='white';pill.textContent='✅ Delivered! 🎉';}
+    if(partner)partner.style.display='flex';
+    // Show rate button in partner area
+    document.getElementById('partner-actions').innerHTML=`<button class="btn" onclick="openRating()" style="padding:7px 14px;font-size:12px;">⭐ Rate</button>`;
+    // Delivered banner
+    document.getElementById('track-banner').style.background='linear-gradient(135deg,#15803d,#22c55e)';
+    document.getElementById('track-banner').innerHTML=`
+      <div style="font-size:56px;margin-bottom:8px;">🎉</div>
+      <h2 style="font-weight:800;font-size:22px;margin-bottom:6px;">Order Delivered! 🎊</h2>
+      <p style="opacity:0.9;margin-bottom:14px;">Enjoy your meal! 😋</p>
+      <button class="btn" onclick="openRating()" style="background:white;color:#16a34a;border-radius:22px;padding:11px 28px;font-size:14px;">⭐ Rate Your Order</button>`;
+    document.getElementById('track-footer').innerHTML=`<div style="display:flex;gap:10px;">
+      <button class="btn btn-outline" style="flex:1;padding:13px;" onclick="goPage('home')">← Home</button>
+      <button class="btn" style="flex:2;padding:13px;font-size:14px;" onclick="openRating()">⭐ Rate Your Order</button>
+    </div>`;
+  }
+}
+
+// ═══ RATING ═══
+function openRating(){
+  foodRating=0;delRating=0;ratingTab='food';
+  document.getElementById('rating-sub').textContent=currentOrder?.restaurant+' · #'+currentOrder?.id;
+  document.getElementById('rating-modal').classList.add('open');
+  switchRatingTab('food');
+}
+function closeRating(){document.getElementById('rating-modal').classList.remove('open');}
+function switchRatingTab(t){
+  ratingTab=t;
+  ['food','delivery'].forEach(id=>{
+    const btn=document.getElementById('rating-tab-'+id);
+    btn.style.background=id===t?'white':'transparent';
+    btn.style.color=id===t?'#FF7B00':'#888';
+  });
+  const labels=['','Poor','Fair','Good','Great','Excellent!'];
+  const val=t==='food'?foodRating:delRating;
+  const setFn=t==='food'?'setFoodR':'setDelR';
+  document.getElementById('rating-body').innerHTML=`
+    <div style="text-align:center;margin-bottom:18px;">
+      <p style="color:#888;font-size:13px;margin-bottom:12px;">${t==='food'?'How was the food?':'How was Ravi\'s delivery?'}</p>
+      <div class="stars" style="justify-content:center;" id="stars-${t}"></div>
+      <div id="rating-label-${t}" style="margin-top:8px;font-weight:700;font-size:14px;height:20px;color:${val>=4?'#22c55e':val>=3?'#FF7B00':'#ef4444'};">${val?labels[val]:''}</div>
+    </div>
+    ${t==='food'?`<button class="btn btn-full" onclick="switchRatingTab('delivery')" style="opacity:${foodRating?1:0.5};" ${foodRating?'':'disabled'}>Next: Rate Delivery →</button>`
+    :`<button class="btn btn-full" onclick="submitRating()" style="font-size:14px;padding:14px;opacity:${(foodRating&&delRating)?1:0.5};" ${(foodRating&&delRating)?'':'disabled'}>${(foodRating&&delRating)?'Submit Rating 🎉':'Rate both food & delivery'}</button>`}`;
+  renderStars(t,val,setFn);
+}
+function renderStars(t,val,setFn){
+  const el=document.getElementById('stars-'+t);
+  if(!el)return;
+  el.innerHTML=[1,2,3,4,5].map(s=>`
+    <button class="star-btn ${s<=val?'on':''}" onclick="${setFn}(${s})" onmouseenter="hoverStar('${t}',${s})" onmouseleave="hoverStar('${t}',0)">
+      <svg width="36" height="36" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="${s<=val?'#FFB800':'#E8E8E8'}" stroke="${s<=val?'#FFB800':'#D1D1D1'}" stroke-width="0.5"/></svg>
+    </button>`).join('');
+}
+function hoverStar(t,s){
+  const val=s||(t==='food'?foodRating:delRating);
+  const el=document.getElementById('stars-'+t);
+  if(!el)return;
+  el.querySelectorAll('path').forEach((p,i)=>{p.setAttribute('fill',i<val?'#FFB800':'#E8E8E8');p.setAttribute('stroke',i<val?'#FFB800':'#D1D1D1');});
+}
+function setFoodR(v){foodRating=v;switchRatingTab('food');}
+function setDelR(v){delRating=v;switchRatingTab('delivery');}
+function submitRating(){
+  document.getElementById('rating-modal').innerHTML=`<div style="display:flex;align-items:center;justify-content:center;min-height:300px;">
+    <div class="modal-sheet" style="max-width:340px;padding:36px 28px;text-align:center;border-radius:24px;">
+      <div style="font-size:60px;margin-bottom:14px;">🎉</div>
+      <h2 style="font-weight:800;font-size:22px;margin-bottom:8px;">Thank You!</h2>
+      <p style="color:#888;font-size:13px;margin-bottom:22px;line-height:1.6;">Your feedback helps us serve you better.<br>₹20 Smokit credits added! 🎁</p>
+      <div style="display:flex;justify-content:center;gap:28px;margin-bottom:24px;">
+        <div style="text-align:center;"><div style="font-weight:800;font-size:26px;color:#FF7B00;">${foodRating}.0</div><div style="font-size:11px;color:#B0B0B0;">Food</div></div>
+        <div style="width:1px;background:#E8E8E8;"></div>
+        <div style="text-align:center;"><div style="font-weight:800;font-size:26px;color:#22c55e;">${delRating}.0</div><div style="font-size:11px;color:#B0B0B0;">Delivery</div></div>
+      </div>
+      <button class="btn btn-full btn-lg" onclick="document.getElementById('rating-modal').classList.remove('open');goPage('home')">Back to Home</button>
+    </div>
+  </div>`;
+  document.getElementById('rating-modal').classList.add('open');
+}
+
+// ═══ PROFILE ═══
+let profileTab='orders';
+function switchTab(t){
+  profileTab=t;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['orders','profile','addresses'][i]===t);
+  });
+  renderTabContent();
+}
+function renderProfile(){
+  if(!user){goPage('login');return;}
+  document.getElementById('prof-avatar').textContent=user.name[0].toUpperCase();
+  document.getElementById('prof-name').textContent=user.name;
+  document.getElementById('prof-email').textContent=user.email;
+  document.getElementById('prof-orders-count').textContent=orders.length;
+  document.getElementById('prof-spent').textContent='₹'+orders.reduce((s,o)=>s+o.total,0).toLocaleString();
+  profileTab='orders';
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  renderTabContent();
+}
+function renderTabContent(){
+  const el=document.getElementById('tab-content');
+  if(profileTab==='orders'){
+    el.innerHTML=orders.map(o=>`
+      <div class="card mb-16" style="padding:16px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="display:flex;gap:7px;align-items:center;margin-bottom:3px;">
+              <span style="font-weight:700;font-size:14px;">${o.restaurant}</span>
+              <span style="background:${o.status==='Delivered'?'#dcfce7':'#FFF8F0'};color:${o.status==='Delivered'?'#16a34a':'#FF7B00'};border-radius:99px;padding:2px 9px;font-size:10px;font-weight:600;">${o.status}</span>
+            </div>
+            <p style="font-size:11px;color:#888;margin-bottom:5px;">${o.date} · ${o.time}</p>
+            <p style="font-size:12px;color:#666;">${o.items.slice(0,2).join(', ')}${o.items.length>2?' +'+( o.items.length-2)+' more':''}</p>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:700;font-size:14px;">₹${o.total}</div>
+            <div style="font-size:10px;color:#B0B0B0;margin-top:3px;">#${o.id}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn-outline btn" style="flex:1;padding:9px;font-size:12px;">Rate Order</button>
+          <button class="btn" style="flex:1;border-radius:10px;padding:9px;font-size:12px;" onclick="goPage('home')">Reorder</button>
+        </div>
+      </div>`).join('');
+  } else if(profileTab==='profile'){
+    el.innerHTML=`<div class="card" style="padding:18px;">
+      ${[['Full Name',user.name,'👤'],['Email',user.email,'📧'],['Phone','+91 98765 43210','📱']].map(([l,v,ic])=>`
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F5F5F5;">
+        <span style="font-size:18px;">${ic}</span>
+        <div style="flex:1;">
+          <div style="font-size:10px;color:#B0B0B0;">${l}</div>
+          <div style="font-size:13px;color:#1A1A1A;margin-top:2px;">${v}</div>
+        </div>
+        <button style="background:none;border:none;color:#FF7B00;font-weight:600;font-size:12px;cursor:pointer;">Edit</button>
+      </div>`).join('')}
+      <button class="btn-red-outline btn" onclick="logout()">🚪 Sign Out</button>
+    </div>`;
+  } else {
+    el.innerHTML=`<div class="stack">
+      ${[{t:'🏠 Home',a:'Flat 4B, Sunrise Apartments, Connaught Place, New Delhi - 110001',d:true},{t:'🏢 Work',a:'Tower 3, Cyber City, Gurugram, Haryana - 122002',d:false}].map(addr=>`
+      <div class="card" style="padding:14px;display:flex;gap:10px;">
+        <div style="flex:1;">
+          <div style="display:flex;gap:7px;margin-bottom:4px;">
+            <span style="font-weight:700;font-size:13px;">${addr.t}</span>
+            ${addr.d?'<span style="background:#dcfce7;color:#16a34a;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:600;">Default</span>':''}
+          </div>
+          <p style="font-size:11px;color:#888;line-height:1.5;">${addr.a}</p>
+        </div>
+        <button style="background:none;border:none;color:#FF7B00;font-weight:600;font-size:12px;cursor:pointer;flex-shrink:0;">Edit</button>
+      </div>`).join('')}
+      <button class="btn-outline btn" style="border-style:dashed;padding:14px;font-size:12px;">+ Add New Address</button>
+    </div>`;
+  }
+}
+function logout(){user=null;updateNav();goPage('home');}
+
+// ═══ CUSTOMER CARE ═══
+const CC_TOPICS=[
+  {k:'track',icon:'📍',label:'Track Order',r:'Your order is being prepared! ETA ~10 min. 👨‍🍳'},
+  {k:'refund',icon:'💰',label:'Refund/Cancel',r:'Refund initiated! ✅ You\'ll receive it within 5–7 business days.'},
+  {k:'wrong',icon:'⚠️',label:'Wrong Item',r:'I\'m so sorry! I\'ve reported the issue and credited ₹50 to your wallet. 🙏'},
+  {k:'delay',icon:'⏱️',label:'Order Delayed',r:'Apologies for the delay! Your order is on priority. ₹30 credits added. 🙏'},
+  {k:'payment',icon:'💳',label:'Payment Issue',r:'Any deduction will auto-refund in 3–5 business days. Ticket raised!'},
+  {k:'help',icon:'💬',label:'Other Help',r:'I\'m here to help! Just ask and I\'ll sort it out. 😊'},
+];
+let ccOpen=false;
+function toggleCC(){
+  ccOpen=!ccOpen;
+  document.getElementById('cc-panel').classList.toggle('open',ccOpen);
+  document.getElementById('cc-fab').textContent=ccOpen?'✕':'💬';
+  if(ccOpen&&document.getElementById('cc-msgs').children.length===0)ccInit();
+}
+function ccInit(){
+  const msgs=document.getElementById('cc-msgs');
+  const quick=CC_TOPICS.map(t=>`<button class="cc-q" onclick="ccSendText('${t.label}')">${t.icon} ${t.label}</button>`).join('');
+  msgs.innerHTML=`<div style="display:flex;flex-direction:column;gap:2px;">
+    <div class="cc-bubble cc-bot">Hi! 👋 I'm your Smokit Support assistant. How can I help?</div>
+    <div class="cc-quick-wrap">${quick}</div>
+  </div>`;
+}
+function ccSend(){
+  const inp=document.getElementById('cc-inp');
+  ccSendText(inp.value);inp.value='';
+}
+function ccSendText(text){
+  if(!text.trim())return;
+  const msgs=document.getElementById('cc-msgs');
+  msgs.innerHTML+=`<div style="display:flex;justify-content:flex-end;"><div class="cc-bubble cc-user">${text}</div></div>`;
+  msgs.innerHTML+=`<div id="cc-typing"><div class="cc-typing"><span></span><span></span><span></span></div></div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    const l=text.toLowerCase();
+    let r=CC_TOPICS[5].r;
+    if(l.includes('track')||l.includes('where'))r=CC_TOPICS[0].r;
+    else if(l.includes('refund')||l.includes('cancel'))r=CC_TOPICS[1].r;
+    else if(l.includes('wrong')||l.includes('missing'))r=CC_TOPICS[2].r;
+    else if(l.includes('delay')||l.includes('late'))r=CC_TOPICS[3].r;
+    else if(l.includes('pay')||l.includes('charge'))r=CC_TOPICS[4].r;
+    else if(l.includes('hi')||l.includes('hello'))r='Hello! 😊 How can I help you today?';
+    else if(l.includes('thanks')||l.includes('thank'))r='You\'re welcome! Anything else? 😊';
+    const typing=document.getElementById('cc-typing');
+    if(typing)typing.remove();
+    msgs.innerHTML+=`<div class="cc-bubble cc-bot">${r}</div>`;
+    msgs.scrollTop=msgs.scrollHeight;
+  },700+Math.random()*500);
+}
+
+// ═══ DARK MODE ═══
+function toggleDark(){
+  const isDark=document.body.classList.toggle('dark');
+  const btn=document.getElementById('dark-toggle');
+  if(btn){btn.innerHTML=isDark?'☀️ Light':'🌙 Dark';}
+  try{localStorage.setItem('smokit-dark',isDark?'1':'0');}catch(e){}
+}
+// Restore saved preference
+(function(){
+  try{
+    if(localStorage.getItem('smokit-dark')==='1'){
+      document.body.classList.add('dark');
+      const btn=document.getElementById('dark-toggle');
+      if(btn){btn.innerHTML='☀️ Light';}
+    }
+  }catch(e){}
+})();
+
+// ═══ INIT ═══
+goPage('home');
+
+// ─── TWEMOJI ───
+function applyTwemoji(){
+  if(typeof twemoji!=='undefined'){
+    twemoji.parse(document.body,{folder:'svg',ext:'.svg',base:'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/'});
+  }
+}
+// Use MutationObserver to re-apply twemoji whenever DOM changes (page nav)
+const _twemojiObserver=new MutationObserver(function(){applyTwemoji();});
+_twemojiObserver.observe(document.getElementById('app')||document.body,{childList:true,subtree:true});
+setTimeout(applyTwemoji,300);
+</script>
+</body>
+</html>
